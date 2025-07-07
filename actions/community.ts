@@ -70,3 +70,12 @@ export async function upvoteAnswer(answerId: string) {
 export async function getSuggestedAnswer(questionId: string) {
   return fetchWithAuth(`/api/community/suggested_answer/${questionId}`);
 }
+
+/**
+ * Delete an answer
+ */
+export async function deleteAnswer(answerId: number) {
+  return fetchWithAuth(`/api/community/answer/${answerId}`, {
+    method: 'DELETE'
+  });
+}

@@ -82,9 +82,6 @@ export default function RegisterPage() {
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-                <Brain className="h-6 w-6 text-white" />
-              </div>
               <span className="text-2xl font-bold text-gradient">E-CLARIA-AI</span>
             </div>
           </div>
@@ -243,9 +240,6 @@ export default function RegisterPage() {
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative">
         <div className="text-center space-y-8 animate-slide-right">
           <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center animate-glow">
-              <Brain className="h-8 w-8 text-white" />
-            </div>
             <span className="text-3xl font-bold text-gradient">E-CLARIA-AI</span>
           </div>
           

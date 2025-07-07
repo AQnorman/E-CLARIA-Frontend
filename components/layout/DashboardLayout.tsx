@@ -55,9 +55,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       }`}>
         <div className="flex items-center justify-between p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-              <Brain className="h-6 w-6 text-white" />
-            </div>
             <span className="text-xl font-bold text-gradient">E-CLARIA-AI</span>
           </div>
           <Button
@@ -138,9 +135,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <Menu className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <Brain className="h-4 w-4 text-white" />
-              </div>
               <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
             </div>
           </div>
