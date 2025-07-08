@@ -17,7 +17,6 @@ import {
   Rocket
 } from 'lucide-react';
 import Link from 'next/link';
-import { EClariaLogo } from '@/components/ui/logo';
 
 export default function HomePage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -100,7 +99,6 @@ export default function HomePage() {
       {/* Floating Navigation */}
       <nav className="floating-nav animate-slide-up">
         <div className="flex items-center gap-2">
-          <EClariaLogo variant="icon" size="sm" className="mr-2" />
           <Link href="#home" className="floating-nav-item active">Home</Link>
           <Link href="#features" className="floating-nav-item">Features</Link>
           <Link href="#about" className="floating-nav-item">About</Link>
@@ -126,10 +124,8 @@ export default function HomePage() {
             
             {/* Brand Title */}
             <div className="mb-8">
-              <div className="flex items-center justify-center gap-4 mb-4">
-                <EClariaLogo variant="icon" size="lg" />
-                <EClariaLogo variant="text" size="lg" />
-              </div>
+                <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA</span>
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
             </div>
             
             <h1 className="text-display mb-8 max-w-5xl mx-auto">
@@ -388,7 +384,7 @@ export default function HomePage() {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <EClariaLogo variant="full" size="md" />
+              <span className="text-xl font-bold text-gradient">E-CLARIA-AI</span>
             </div>
             <div className="text-small text-secondary">
               © 2025 E-CLARIA-AI. Revolutionizing non-profit impact through AI.

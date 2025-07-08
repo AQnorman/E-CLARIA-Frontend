@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Brain, ArrowLeft, Loader2, Eye, EyeOff, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { EClariaLogo } from '@/components/ui/logo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -52,7 +51,7 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative">
         <div className="text-center space-y-8 animate-slide-left">
           <div className="flex items-center justify-center gap-4 mb-8">
-            <EClariaLogo variant="full" size="lg" />
+            <span className="text-3xl font-bold text-gradient">E-CLARIA-AI</span>
           </div>
           
           <h1 className="text-heading max-w-md">
@@ -89,7 +88,7 @@ export default function LoginPage() {
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <EClariaLogo variant="full" size="md" />
+              <span className="text-2xl font-bold text-gradient">E-CLARIA-AI</span>
             </div>
           </div>
 

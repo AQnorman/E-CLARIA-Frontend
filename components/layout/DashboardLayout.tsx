@@ -17,7 +17,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { EClariaLogo } from '@/components/ui/logo';
 import { useState, useEffect } from 'react';
 
 interface DashboardLayoutProps {
@@ -76,7 +75,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Sidebar header */}
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-2">
-            <EClariaLogo variant="full" size="sm" />
+            <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
           </div>
           <Button
             onClick={() => setSidebarOpen(false)}
@@ -164,7 +163,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <Menu className="h-4 w-4" />
           </Button>
-          <EClariaLogo variant="icon" size="sm" />
+          <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
           <div className="w-8" /> {/* Empty space for balance */}
         </header>
 
