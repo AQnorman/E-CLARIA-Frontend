@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
   formData.append('username', email);
   formData.append('password', password);
 
-  console.log(API_BASE_URL);
+  console.log(email, password)
 
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
