@@ -123,13 +123,8 @@ export default function HomePage() {
           <div className="animate-slide-up">
             {/* Brand Title */}
             <div className="mb-8">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 backdrop-blur-sm mb-6">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                  <Brain className="h-4 w-4 text-white" />
-                </div>
                 <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA-AI</span>
                 <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
-              </div>
             </div>
             
             <h1 className="text-display mb-8 max-w-5xl mx-auto">
