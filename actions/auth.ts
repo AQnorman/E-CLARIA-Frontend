@@ -9,13 +9,6 @@ const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
  * Login user with email and password
  */
 export async function login(email: string, password: string) {
-  // Ensure we're in a valid request context
-  try {
-    const cookieStore = await cookies();
-  } catch (error) {
-    throw new Error('Login function must be called within a valid request context');
-  }
-
   const formData = new FormData();
   formData.append('username', email);
   formData.append('password', password);
