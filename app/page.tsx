@@ -163,20 +163,29 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-12 md:gap-16">
             {/* Vultr */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <img 
-                src="https://www.vultr.com/dist/img/brand/vultr-logo-onwhite-text.svg" 
-                alt="Vultr" 
-                className="h-8 w-auto filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity duration-300"
-              />
+              <svg className="h-10 w-auto" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Vultr Logo */}
+                <path d="M8 4L16 20H24L16 4H8Z" fill="currentColor" className="text-blue-500"/>
+                <path d="M0 20L8 4H16L8 20H0Z" fill="currentColor" className="text-blue-400"/>
+                <path d="M16 20L24 4H32L24 20H16Z" fill="currentColor" className="text-blue-600"/>
+                <text x="40" y="18" className="fill-current text-foreground text-sm font-semibold" fontFamily="system-ui">
+                  Vultr
+                </text>
+              </svg>
             </div>
             
             {/* Groq */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <img 
-                src="https://groq.com/wp-content/uploads/2024/03/PBG-mark1-color.svg" 
-                alt="Groq" 
-                className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300"
-              />
+              <svg className="h-10 w-auto" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Groq Logo */}
+                <circle cx="8" cy="16" r="6" fill="currentColor" className="text-orange-500"/>
+                <circle cx="16" cy="8" r="4" fill="currentColor" className="text-orange-400"/>
+                <circle cx="16" cy="24" r="4" fill="currentColor" className="text-red-500"/>
+                <circle cx="24" cy="16" r="3" fill="currentColor" className="text-red-400"/>
+                <text x="34" y="18" className="fill-current text-foreground text-sm font-semibold" fontFamily="system-ui">
+                  Groq
+                </text>
+              </svg>
             </div>
           </div>
         </div>
