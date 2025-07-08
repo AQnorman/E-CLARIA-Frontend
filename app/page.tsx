@@ -121,16 +121,6 @@ export default function HomePage() {
       <section id="home" className="min-h-screen flex items-center justify-center pt-16 relative overflow-hidden">
         <div className="container text-center relative z-10">
           <div className="animate-slide-up">
-            {/* Hackathon Badge */}
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 backdrop-blur-sm">
-                <div className="w-6 h-6 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
-                  <Zap className="h-3 w-3 text-white" />
-                </div>
-                <span className="text-gradient font-semibold text-sm tracking-wide">RAISE YOUR HACK 2025</span>
-                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-              </div>
-            </div>
             
             {/* Brand Title */}
             <div className="mb-8">
