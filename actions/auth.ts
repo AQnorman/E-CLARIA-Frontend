@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
   formData.append('username', email);
   formData.append('password', password);
 
-  console.log(email, password)
+  console.log(API_BASE_URL)
 
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
@@ -25,27 +25,22 @@ export async function login(email: string, password: string) {
     let errorMessage = `Login failed (${response.status} ${response.statusText})`;
     
     try {
-      // Read the response body as text first
-      const responseText = await response.text();
-      
-      try {
-        // Try to parse as JSON
-        const errorData = JSON.parse(responseText);
-        if (errorData.detail) {
-          errorMessage = errorData.detail;
-        } else {
-          console.error('Unexpected error response format:', errorData);
-          errorMessage = `Login failed: ${JSON.stringify(errorData)}`;
-        }
-      } catch (jsonParseError) {
-        // If JSON parsing fails, use the raw text
-        console.error('Non-JSON error response:', responseText);
-        errorMessage = `Login failed (${response.status}): ${responseText}`;
+      const errorData = await response.json();
+      if (errorData.detail) {
+        errorMessage = errorData.detail;
+      } else {
+        console.error('Unexpected error response format:', errorData);
+        errorMessage = `Login failed: ${JSON.stringify(errorData)}`;
       }
-    } catch (readError) {
-      // If we can't read the response at all
-      console.error('Could not read error response:', readError);
-      errorMessage = `Login failed (${response.status} ${response.statusText})`;
+    } catch (parseError) {
+      // If response is not JSON, get the raw text for debugging
+      try {
+        const errorText = await response.text();
+        console.error('Non-JSON error response:', errorText);
+        errorMessage = `Login failed (${response.status}): ${errorText}`;
+      } catch (textError) {
+        console.error('Could not parse error response:', textError);
+      }
     }
     
     throw new Error(errorMessage);
@@ -63,6 +58,7 @@ export async function login(email: string, password: string) {
 
   return data;
 }
+
 
 /**
  * Register a new user
