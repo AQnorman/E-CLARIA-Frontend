@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Brain, ArrowLeft, Loader2, Eye, EyeOff, CheckCircle, Sparkles, Shield } from 'lucide-react';
+import { Brain, ArrowLeft, Loader2, Eye, EyeOff, Check, X, Sparkles, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
@@ -164,9 +164,17 @@ export default function RegisterPage() {
                     <div className="text-small font-medium text-primary mb-2">Password Requirements:</div>
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center gap-3">
-                        <CheckCircle 
-                          className={`h-4 w-4 transition-colors ${req.met ? 'text-success' : 'text-muted'}`}
-                        />
+                        <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          req.met 
+                            ? 'bg-success text-white' 
+                            : 'bg-muted/30 text-muted border border-muted/50'
+                        }`}>
+                          {req.met ? (
+                            <Check className="h-2.5 w-2.5" />
+                          ) : (
+                            <X className="h-2.5 w-2.5" />
+                          )}
+                        </div>
                         <span className={`text-small transition-colors ${req.met ? 'text-success' : 'text-muted'}`}>
                           {req.text}
                         </span>
