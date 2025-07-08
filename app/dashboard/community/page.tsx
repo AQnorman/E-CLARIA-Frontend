@@ -115,6 +115,9 @@ export default function CommunityPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [answerToDelete, setAnswerToDelete] = useState<number | null>(null);
   
+  // Modal states
+  const [showNewQuestionModal, setShowNewQuestionModal] = useState(false);
+  
   // This function was moved to line ~550
   
   // Form states
@@ -339,7 +342,7 @@ export default function CommunityPage() {
         content: '',
         tags: ''
       });
-      setShowNewQuestionForm(false);
+      setShowNewQuestionModal(false);
       
       // Refresh questions list
       try {
@@ -660,14 +663,14 @@ export default function CommunityPage() {
                 <MessageCircle className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-heading">Community Q&A</h1>
-                <p className="text-body text-secondary">
+                <h1 className="text-2xl font-semibold">Community Q&A</h1>
+                <p className="text-sm text-secondary">
                   Connect, learn, and share knowledge with other non-profit leaders
                 </p>
               </div>
             </div>
             
-            <div className="flex items-center gap-6 text-small">
+            <div className="flex items-center gap-6 text-xs">
               <div className="flex items-center gap-2">
                 <Brain className="h-4 w-4 text-primary" />
                 <span className="text-secondary">AI-Powered</span>
@@ -695,16 +698,16 @@ export default function CommunityPage() {
             <div className="floating-card p-6">
               <div className="flex items-center gap-3 mb-6">
                 <TrendingUp className="h-5 w-5 text-primary" />
-                <h3 className="text-subheading">Community Stats</h3>
+                <h3 className="text-lg font-medium">Community Stats</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 glass-card">
-                  <div className="text-xl font-bold text-primary">{questions.length}</div>
+                  <div className="text-lg font-bold text-primary">{questions.length}</div>
                   <div className="text-xs text-secondary">Questions</div>
                 </div>
                 <div className="text-center p-3 glass-card">
-                  <div className="text-xl font-bold text-success">
+                  <div className="text-lg font-bold text-success">
                     {answers.reduce((sum, answer) => sum + answer.upvotes, 0)}
                   </div>
                   <div className="text-xs text-secondary">Total Votes</div>
@@ -714,7 +717,7 @@ export default function CommunityPage() {
               <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-accent/20">
                 <div className="flex items-center gap-2 mb-1">
                   <Star className="h-4 w-4 text-accent" />
-                  <span className="text-small font-medium text-accent">Featured</span>
+                  <span className="text-xs font-medium text-accent">Featured</span>
                 </div>
                 <p className="text-xs text-secondary">
                   Get AI-powered suggestions for your answers and earn community points!
@@ -726,10 +729,10 @@ export default function CommunityPage() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <MessageSquare className="h-5 w-5 text-primary" />
-                  <h2 className="text-subheading">Questions</h2>
+                  <h2 className="text-lg font-medium">Questions</h2>
                 </div>
                 <Button
-                  onClick={() => setShowNewQuestionForm(!showNewQuestionForm)}
+                  onClick={() => setShowNewQuestionModal(true)}
                   className="btn btn-primary"
                   size="sm"
                 >
@@ -830,84 +833,6 @@ export default function CommunityPage() {
                 )}
               </div>
               
-              {/* New Question Form */}
-              {showNewQuestionForm && (
-                <div className="glass-card p-6 mb-6 border border-primary/20 bg-primary/5">
-                  <h3 className="text-small font-medium mb-4">Ask a New Question</h3>
-                  <form onSubmit={handlePostQuestion} className="space-y-4">
-                    <div>
-                      <Label htmlFor="title" className="text-xs font-medium text-primary mb-1 block">
-                        Title
-                      </Label>
-                      <Input
-                        id="title"
-                        value={newQuestion.title}
-                        onChange={(e) => setNewQuestion({...newQuestion, title: e.target.value})}
-                        placeholder="What's your question?"
-                        className="input"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="content" className="text-xs font-medium text-primary mb-1 block">
-                        Details
-                      </Label>
-                      <Textarea
-                        id="content"
-                        value={newQuestion.content}
-                        onChange={(e) => setNewQuestion({...newQuestion, content: e.target.value})}
-                        placeholder="Provide more details about your question..."
-                        className="input min-h-[100px]"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="tags" className="text-xs font-medium text-primary mb-1 block">
-                        Tags (comma-separated)
-                      </Label>
-                      <Input
-                        id="tags"
-                        value={newQuestion.tags}
-                        onChange={(e) => setNewQuestion({...newQuestion, tags: e.target.value})}
-                        placeholder="e.g., fundraising, volunteers, strategy"
-                        className="input"
-                      />
-                    </div>
-                    
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        type="button"
-                        onClick={() => setShowNewQuestionForm(false)}
-                        className="btn btn-secondary"
-                        size="sm"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={postingQuestion}
-                        className="btn btn-primary"
-                        size="sm"
-                      >
-                        {postingQuestion ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Posting...
-                          </>
-                        ) : (
-                          <>
-                            <Send className="mr-2 h-4 w-4" />
-                            Post Question
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-              )}
-              
               {/* Questions List */}
               {loading ? (
                 <div className="flex items-center justify-center py-8">
@@ -925,7 +850,7 @@ export default function CommunityPage() {
                         }`}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <h3 className="text-small font-medium group-hover:text-gradient transition-all duration-300 flex-1">
+                          <h3 className="text-sm font-medium group-hover:text-gradient transition-all duration-300 flex-1">
                             {question.title}
                           </h3>
                           <ArrowRight className="h-4 w-4 text-secondary group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 ml-2" />
@@ -1023,9 +948,9 @@ export default function CommunityPage() {
                     <MessageCircle className="h-8 w-8 text-green-500" />
                   </div>
                   <h3 className="text-subheading mb-2">No questions yet</h3>
-                  <p className="text-body text-secondary mb-4">Be the first to start a conversation!</p>
+                  <p className="text-sm text-secondary mb-4">Be the first to start a conversation!</p>
                   <Button
-                    onClick={() => setShowNewQuestionForm(true)}
+                    onClick={() => setShowNewQuestionModal(true)}
                     className="btn btn-primary"
                     size="sm"
                   >
@@ -1045,12 +970,12 @@ export default function CommunityPage() {
                 <div className="floating-card p-6">
                   <div className="flex items-center gap-3 mb-4">
                     <CheckCircle2 className="h-5 w-5 text-success" />
-                    <span className="text-small font-medium text-success">Selected Question</span>
+                    <span className="text-xs font-medium text-success">Selected Question</span>
                   </div>
-                  <h2 className="text-subheading mb-4">{selectedQuestion.title}</h2>
-                  <p className="text-body mb-6">{selectedQuestion.content}</p>
+                  <h2 className="text-lg font-medium mb-4">{selectedQuestion.title}</h2>
+                  <p className="text-sm mb-6">{selectedQuestion.content}</p>
                   
-                  <div className="flex items-center justify-between text-small bg-surface/30 p-4 rounded-lg">
+                  <div className="flex items-center justify-between text-xs bg-surface/30 p-4 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-secondary" />
@@ -1079,8 +1004,8 @@ export default function CommunityPage() {
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                       <Heart className="h-5 w-5 text-accent" />
-                      <h3 className="text-subheading">
-                        Answers <span className="text-small text-secondary">({answers.length})</span>
+                      <h3 className="text-lg font-medium">
+                        Answers <span className="text-xs text-secondary">({answers.length})</span>
                       </h3>
                     </div>
                     <div className="flex gap-2">
@@ -1114,7 +1039,7 @@ export default function CommunityPage() {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-accent" />
-                          <h4 className="text-small font-medium">AI-Suggested Answer</h4>
+                          <h4 className="text-xs font-medium">AI-Suggested Answer</h4>
                         </div>
                         <Button
                           onClick={handleUseSuggestion}
@@ -1124,14 +1049,14 @@ export default function CommunityPage() {
                           Use This
                         </Button>
                       </div>
-                      <p className="text-small">{suggestedAnswer}</p>
+                      <p className="text-xs">{suggestedAnswer}</p>
                     </div>
                   )}
                   
                   {/* Answer Form */}
                   {showAnswerForm && (
                     <div className="glass-card p-6 mb-6 border border-primary/20 bg-primary/5">
-                      <h4 className="text-small font-medium mb-4">Your Answer</h4>
+                      <h4 className="text-xs font-medium mb-4">Your Answer</h4>
                       <form onSubmit={handlePostAnswer} className="space-y-4">
                         <Textarea
                           value={newAnswer}
@@ -1178,19 +1103,19 @@ export default function CommunityPage() {
                     <div className="space-y-6">
                       {answers.map((answer) => (
                         <div key={answer.id} className="glass-card p-6 hover:bg-surface/30 transition-all duration-300 group">
-                          <p className="text-body mb-4">{answer.content}</p>
+                          <p className="text-sm mb-4">{answer.content}</p>
                           
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-secondary" />
-                              <span className="text-small text-secondary">
+                              <span className="text-xs text-secondary">
                                 User #{answer.user_id}
                               </span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Clock className="h-4 w-4 text-secondary" />
-                                <span className="text-small text-secondary">
+                                <span className="text-xs text-secondary">
                                   {answer.created_at 
                                     ? new Date(answer.created_at).toLocaleDateString()
                                     : 'Recently'
@@ -1238,8 +1163,8 @@ export default function CommunityPage() {
                       <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Heart className="h-8 w-8 text-accent" />
                       </div>
-                      <h3 className="text-subheading mb-2">No answers yet</h3>
-                      <p className="text-body text-secondary mb-4">Be the first to help with this question!</p>
+                      <h3 className="text-lg font-medium mb-2">No answers yet</h3>
+                      <p className="text-sm text-secondary mb-4">Be the first to help with this question!</p>
                       <Button
                         onClick={() => setShowAnswerForm(true)}
                         className="btn btn-primary"
@@ -1258,8 +1183,8 @@ export default function CommunityPage() {
                   <div className="w-20 h-20 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <MessageCircle className="h-10 w-10 text-green-500" />
                   </div>
-                  <h3 className="text-subheading mb-2">Select a Question</h3>
-                  <p className="text-body text-secondary max-w-sm mx-auto">
+                  <h3 className="text-lg font-medium mb-2">Select a Question</h3>
+                  <p className="text-sm text-secondary max-w-sm mx-auto">
                     Choose a question from the list to view details and answers
                   </p>
                 </div>
@@ -1271,6 +1196,88 @@ export default function CommunityPage() {
       
       {/* Render the delete confirmation dialog */}
       {DeleteConfirmationDialog}
+      
+      {/* New Question Modal */}
+      <Dialog open={showNewQuestionModal} onOpenChange={setShowNewQuestionModal}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Ask a New Question</DialogTitle>
+            <DialogDescription>
+              Share your question with the community and get expert answers.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handlePostQuestion} className="space-y-6">
+            <div>
+              <Label htmlFor="modal-title" className="text-xs font-medium text-primary mb-2 block">
+                Question Title
+              </Label>
+              <Input
+                id="modal-title"
+                value={newQuestion.title}
+                onChange={(e) => setNewQuestion({...newQuestion, title: e.target.value})}
+                placeholder="What's your question?"
+                className="input"
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="modal-content" className="text-xs font-medium text-primary mb-2 block">
+                Question Details
+              </Label>
+              <Textarea
+                id="modal-content"
+                value={newQuestion.content}
+                onChange={(e) => setNewQuestion({...newQuestion, content: e.target.value})}
+                placeholder="Provide more details about your question..."
+                className="input min-h-[120px]"
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="modal-tags" className="text-xs font-medium text-primary mb-2 block">
+                Tags (comma-separated)
+              </Label>
+              <Input
+                id="modal-tags"
+                value={newQuestion.tags}
+                onChange={(e) => setNewQuestion({...newQuestion, tags: e.target.value})}
+                placeholder="e.g., fundraising, volunteers, strategy"
+                className="input"
+              />
+            </div>
+            
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowNewQuestionModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={postingQuestion}
+                className="btn btn-primary"
+              >
+                {postingQuestion ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Posting...
+                  </>
+                ) : (
+                  <>
+                    <Send className="mr-2 h-4 w-4" />
+                    Post Question
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
