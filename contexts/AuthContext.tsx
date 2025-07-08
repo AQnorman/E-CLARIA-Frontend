@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { login as loginAction, register as registerAction, logout as logoutAction } from '@/actions/auth';
 
 interface User {
   id: number;
@@ -55,20 +56,7 @@ export function AuthProvider({
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
+      const data = await loginAction(email, password);
       
       if (data.success && data.user) {
         setUser(data.user);

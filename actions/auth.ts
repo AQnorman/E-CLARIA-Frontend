@@ -64,7 +64,13 @@ export async function login(email: string, password: string) {
     path: '/',
   });
 
-  return data;
+  // Get user data after successful login
+  const user = await getCurrentUser();
+  
+  return {
+    success: true,
+    user: user
+  };
 }
 
 
