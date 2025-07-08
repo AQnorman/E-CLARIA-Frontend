@@ -163,22 +163,20 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-12 md:gap-16">
             {/* Vultr */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <span className="text-body font-medium">Vultr</span>
+              <img 
+                src="https://www.vultr.com/dist/img/brand/vultr-logo-onwhite-text.svg" 
+                alt="Vultr" 
+                className="h-8 w-auto filter brightness-0 invert opacity-70 hover:opacity-100 transition-opacity duration-300"
+              />
             </div>
             
             {/* Groq */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
-                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-              <span className="text-body font-medium">Groq</span>
+              <img 
+                src="https://groq.com/wp-content/uploads/2024/03/PBG-mark1-color.svg" 
+                alt="Groq" 
+                className="h-8 w-auto opacity-70 hover:opacity-100 transition-opacity duration-300"
+              />
             </div>
           </div>
         </div>
