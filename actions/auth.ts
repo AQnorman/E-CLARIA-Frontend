@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
   formData.append('username', email);
   formData.append('password', password);
 
-  console.log(API_BASE_URL)
+  console.log(API_BASE_URL);
 
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
@@ -63,77 +63,6 @@ export async function login(email: string, password: string) {
 
   return data;
 }
-
-
-/**
- * Register a new user
- */
-export async function register(name: string, email: string, password: string) {
-  return fetchWithoutAuth('/api/auth/register', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, email, password }),
-  });
-}
-
-/**
- * Get current user data
- */
-export async function getCurrentUser() {
-  const token = cookies().get('token')?.value;
-  
-  if (!token) {
-    return null;
-  }
-
-  try {
-    return await fetchWithAuth('/api/auth/me');
-  } catch (error) {
-    // Return null instead of throwing an error for this specific endpoint
-    return null;
-  }
-}
-
-/**
- * Logout user
- */
-export async function logout() {
-  cookies().delete('token');
-  return { success: true };
-}
-      } else {
-        console.error('Unexpected error response format:', errorData);
-        errorMessage = `Login failed: ${JSON.stringify(errorData)}`;
-      }
-    } catch (parseError) {
-      // If response is not JSON, get the raw text for debugging
-      try {
-        const errorText = await response.text();
-        console.error('Non-JSON error response:', errorText);
-        errorMessage = `Login failed (${response.status}): ${errorText}`;
-      } catch (textError) {
-        console.error('Could not parse error response:', textError);
-      }
-    }
-    
-    throw new Error(errorMessage);
-  }
-
-  const data = await response.json();
-  
-  // Store token in an HTTP-only cookie for better security
-  cookies().set('token', data.access_token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 60 * 60 * 24 * 7, // 1 week
-    path: '/',
-  });
-
-  return data;
-}
-
 
 /**
  * Register a new user
