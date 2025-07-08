@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { login as loginAction } from '../actions/auth';
 
 interface User {
   id: number;
@@ -62,23 +63,14 @@ export function AuthProvider({
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await loginAction(email, password);
       
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+      if (!result.success) {
+        throw new Error(result.error || 'Login failed');
       }
       
-      if (data.success && data.user) {
-        setUser(data.user);
+      if (result.user) {
+        setUser(result.user);
         router.push('/dashboard');
       } else {
         throw new Error('Invalid response from server');
