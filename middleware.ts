@@ -5,6 +5,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth');
   const isDashboardPage = request.nextUrl.pathname.startsWith('/dashboard');
+  const isHomePage = request.nextUrl.pathname === '/';
 
   // If user is not authenticated and trying to access dashboard
   if (!token && isDashboardPage) {
@@ -12,7 +13,7 @@ export function middleware(request: NextRequest) {
   }
 
   // If user is authenticated and trying to access auth pages
-  if (token && isAuthPage) {
+  if (token && isAuthPage && !isHomePage) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
@@ -20,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/auth/:path*'],
+  matcher: ['/dashboard/:path*', '/auth/:path*', '/'],
 };
