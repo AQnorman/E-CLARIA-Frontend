@@ -258,7 +258,7 @@ export default function HomePage() {
               <span className="text-xl font-bold text-gradient">E-CLARIA-AI</span>
             </div>
             <div className="text-small text-secondary">
-              © 2024 E-CLARIA-AI. Revolutionizing non-profit impact through AI.
+              © 2025 E-CLARIA-AI. Revolutionizing non-profit impact through AI.
             </div>
           </div>
         </div>
