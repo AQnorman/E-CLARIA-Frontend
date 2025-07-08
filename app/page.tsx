@@ -156,30 +156,6 @@ export default function HomePage() {
                 Explore Platform
               </Link>
             </div>
-            
-            {/* Key Features Preview */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              <div className="glass-card p-4 text-center group hover:bg-primary/5 transition-all duration-300">
-                <Target className="h-8 w-8 text-primary mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-small font-medium mb-1">AI Strategy</h3>
-                <p className="text-xs text-secondary">Smart planning</p>
-              </div>
-              <div className="glass-card p-4 text-center group hover:bg-accent/5 transition-all duration-300">
-                <Heart className="h-8 w-8 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-small font-medium mb-1">Smart Outreach</h3>
-                <p className="text-xs text-secondary">Compelling content</p>
-              </div>
-              <div className="glass-card p-4 text-center group hover:bg-success/5 transition-all duration-300">
-                <MessageCircle className="h-8 w-8 text-success mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-small font-medium mb-1">Community</h3>
-                <p className="text-xs text-secondary">Expert network</p>
-              </div>
-              <div className="glass-card p-4 text-center group hover:bg-yellow-500/5 transition-all duration-300">
-                <Users className="h-8 w-8 text-yellow-500 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
-                <h3 className="text-small font-medium mb-1">Mentorship</h3>
-                <p className="text-xs text-secondary">Guided growth</p>
-              </div>
-            </div>
           </div>
         </div>
 
