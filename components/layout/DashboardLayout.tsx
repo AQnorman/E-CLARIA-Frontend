@@ -52,7 +52,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     { name: 'Smart Outreach', href: '/dashboard/outreach', icon: Heart, color: 'from-pink-500 to-red-500' },
     { name: 'Community', href: '/dashboard/community', icon: MessageCircle, color: 'from-green-500 to-teal-500' },
     { name: 'Mentorship', href: '/dashboard/mentorship', icon: Users, color: 'from-yellow-500 to-orange-500' },
-    { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp, color: 'from-indigo-500 to-blue-500' },
+    // { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp, color: 'from-indigo-500 to-blue-500' },
     
   ];
 

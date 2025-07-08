@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,6 +68,7 @@ export default function MentorshipPage() {
   const [showOptInDialog, setShowOptInDialog] = useState(false);
   const [showMessageDialog, setShowMessageDialog] = useState(false);
   const [suggestedReply, setSuggestedReply] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [optingIn, setOptingIn] = useState(false);
@@ -78,6 +79,17 @@ export default function MentorshipPage() {
     bio: '',
   });
 
+  // Scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Effect to scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Effect to load mentors on component mount
   useEffect(() => {
     loadMentors();
   }, []);
@@ -189,6 +201,8 @@ export default function MentorshipPage() {
       timestamp: new Date().toISOString(),
       message: newMessage.trim()
     };
+
+    console.log(tempMessage)
     
     // Optimistically update UI
     setMessages([...messages, tempMessage]);
@@ -198,16 +212,20 @@ export default function MentorshipPage() {
     try {
       setSendingMessage(true);
       // Get the response from sendMessage which contains the newly created message
-      const response = await sendMessage({
-        receiver_id: selectedMentor.user_id,
+      // Ensure all IDs are integers as expected by the API
+      const messageData = {
+        sender_id: parseInt(String(user.id)),
+        receiver_id: parseInt(String(selectedMentor.user_id)),
         message: tempMessage.message
-      });
+      };
+      
+      const response = await sendMessage(messageData);
       
       if (response && response.message) {
         // Replace the temporary message with the server response
         const updatedMessages = messages.filter(msg => msg.id !== tempMessage.id);
         // Add the new message from the response
-        const newMessages = [...updatedMessages, response.message];
+        const newMessages = [...updatedMessages, response];
         // Sort messages by timestamp in ascending order (earliest first)
         const sortedMessages = newMessages.sort(
           (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -534,33 +552,44 @@ export default function MentorshipPage() {
               {/* Messages */}
               <div className="max-h-[300px] overflow-y-auto space-y-4 p-4 bg-surface/30 rounded-lg">
                 {messages.length > 0 ? (
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                    >
+                  messages.map((message) => {
+                    // Determine if this is the current user's message
+                    const isCurrentUser = message.sender_id === user?.id;
+                    
+                    return (
                       <div
-                        className={`max-w-[80%] p-3 rounded-lg ${
-                          message.sender_id === user?.id
-                            ? 'bg-primary text-white'
-                            : 'bg-surface border border-border'
-                        }`}
+                        key={message.id}
+                        className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="text-small">{message.message}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.sender_id === user?.id ? 'text-white/70' : 'text-secondary'
-                        }`}>
-                          {new Date(message.timestamp).toLocaleTimeString()}
-                        </p>
+                        <div
+                          className={`max-w-[80%] p-3 rounded-lg ${
+                            isCurrentUser
+                              ? 'bg-primary text-white'
+                              : 'bg-surface border border-border'
+                          }`}
+                        >
+                          <p className="text-small">{message.message}</p>
+                          <p className={`text-xs mt-1 ${
+                            isCurrentUser ? 'text-white/70' : 'text-secondary'
+                          }`}>
+                            {message.timestamp ? new Date(message.timestamp).toLocaleString(undefined, {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            }) : 'Just now'}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="text-center py-8">
                     <MessageCircle className="h-8 w-8 text-secondary/30 mx-auto mb-2" />
                     <p className="text-small text-secondary">No messages yet. Start the conversation!</p>
                   </div>
                 )}
+                {/* This empty div is used as a reference for scrolling to the bottom */}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* AI Suggestion */}

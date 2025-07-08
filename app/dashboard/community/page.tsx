@@ -592,12 +592,9 @@ export default function CommunityPage() {
     }
     
     try {
-      const response = await deleteAnswer(answerToDelete);
-      
-      // Check if deletion was successful
-      if (!response || response.error) {
-        throw new Error(response?.error || 'Failed to delete answer');
-      }
+      console.log("Answer ID", answerToDelete)
+      // Only pass the answer ID to the deleteAnswer function
+      await deleteAnswer(answerToDelete);
       
       // Remove the deleted answer from the state
       setAnswers(prev => prev.filter(answer => answer.id !== answerToDelete));
@@ -610,9 +607,7 @@ export default function CommunityPage() {
       console.error('Error deleting answer:', error);
       toast({
         title: "Failed to delete answer",
-        description: typeof error === 'object' && error !== null && 'message' in error 
-          ? String(error.message)
-          : "Could not delete your answer.",
+        description: "There was an error deleting your answer.",
         variant: "destructive",
       });
     } finally {
