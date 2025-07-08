@@ -154,7 +154,7 @@ export default function HomePage() {
       </section>
 
       {/* Powered By Section */}
-      <section className="py-12 border-b border-border/30">
+      <section className="py-12">
         <div className="container">
           <div className="text-center mb-8">
             <p className="text-small text-secondary mb-6">Powered by</p>
