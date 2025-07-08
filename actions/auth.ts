@@ -22,8 +22,28 @@ export async function login(email: string, password: string) {
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ detail: 'Login failed' }));
-    throw new Error(errorData.detail || 'Login failed');
+    let errorMessage = `Login failed (${response.status} ${response.statusText})`;
+    
+    try {
+      const errorData = await response.json();
+      if (errorData.detail) {
+        errorMessage = errorData.detail;
+      } else {
+        console.error('Unexpected error response format:', errorData);
+        errorMessage = `Login failed: ${JSON.stringify(errorData)}`;
+      }
+    } catch (parseError) {
+      // If response is not JSON, get the raw text for debugging
+      try {
+        const errorText = await response.text();
+        console.error('Non-JSON error response:', errorText);
+        errorMessage = `Login failed (${response.status}): ${errorText}`;
+      } catch (textError) {
+        console.error('Could not parse error response:', textError);
+      }
+    }
+    
+    throw new Error(errorMessage);
   }
 
   const data = await response.json();
