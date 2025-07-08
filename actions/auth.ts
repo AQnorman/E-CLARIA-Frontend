@@ -9,6 +9,13 @@ const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
  * Login user with email and password
  */
 export async function login(email: string, password: string) {
+  // Ensure we're in a valid request context
+  try {
+    const cookieStore = cookies();
+  } catch (error) {
+    throw new Error('Login function must be called within a valid request context');
+  }
+
   const formData = new FormData();
   formData.append('username', email);
   formData.append('password', password);
@@ -49,7 +56,8 @@ export async function login(email: string, password: string) {
   const data = await response.json();
   
   // Store token in an HTTP-only cookie for better security
-  cookies().set('token', data.access_token, {
+  const cookieStore = cookies();
+  cookieStore.set('token', data.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -77,7 +85,14 @@ export async function register(name: string, email: string, password: string) {
  * Get current user data
  */
 export async function getCurrentUser() {
-  const token = cookies().get('token')?.value;
+  let token;
+  try {
+    const cookieStore = cookies();
+    token = cookieStore.get('token')?.value;
+  } catch (error) {
+    // If cookies() fails, we're not in a valid request context
+    return null;
+  }
   
   if (!token) {
     return null;
@@ -95,6 +110,11 @@ export async function getCurrentUser() {
  * Logout user
  */
 export async function logout() {
-  cookies().delete('token');
+  try {
+    const cookieStore = cookies();
+    cookieStore.delete('token');
+  } catch (error) {
+    throw new Error('Logout function must be called within a valid request context');
+  }
   return { success: true };
 }
