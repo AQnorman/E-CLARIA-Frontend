@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import * as authActions from '@/actions/auth';
 
 interface User {
   id: number;
@@ -33,12 +32,22 @@ export function AuthProvider({
 
   const checkAuth = async () => {
     try {
-      const userData = await authActions.getCurrentUser();
-      if (userData) {
-        setUser(userData);
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      } else {
+        setUser(null);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -46,9 +55,27 @@ export function AuthProvider({
 
   const login = async (email: string, password: string) => {
     try {
-      await authActions.login(email, password);
-      await checkAuth();
-      router.push('/dashboard');
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+      
+      if (data.success && data.user) {
+        setUser(data.user);
+        router.push('/dashboard');
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       throw error;
     }
@@ -56,17 +83,50 @@ export function AuthProvider({
 
   const register = async (name: string, email: string, password: string) => {
     try {
-      await authActions.register(name, email, password);
-      await login(email, password);
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+      
+      if (data.success) {
+        if (data.requiresLogin) {
+          // Registration succeeded but auto-login failed, redirect to login
+          router.push('/auth/login');
+        } else if (data.user) {
+          // Registration and auto-login succeeded
+          setUser(data.user);
+          router.push('/dashboard');
+        }
+      } else {
+        throw new Error('Invalid response from server');
+      }
     } catch (error) {
       throw error;
     }
   };
 
   const logout = async () => {
-    await authActions.logout();
-    setUser(null);
-    router.push('/');
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      router.push('/');
+    }
   };
 
   return (
