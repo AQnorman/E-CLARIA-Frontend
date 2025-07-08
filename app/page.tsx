@@ -121,19 +121,31 @@ export default function HomePage() {
       <section id="home" className="min-h-screen flex items-center justify-center relative overflow-hidden">
         <div className="container text-center relative z-10">
           <div className="animate-slide-up">
+            {/* Brand Title */}
+            <div className="mb-8">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 backdrop-blur-sm mb-6">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+                  <Brain className="h-4 w-4 text-white" />
+                </div>
+                <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA-AI</span>
+                <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
+              </div>
+            </div>
             
             <h1 className="text-display mb-8 max-w-5xl mx-auto">
-              Revolutionize Your
+              Transform Your
               <br />
               <span className="text-gradient">Non-Profit Impact</span>
+              <br />
+              <span className="text-2xl md:text-4xl font-normal text-secondary">with AI-Powered Intelligence</span>
             </h1>
             
             <p className="text-body text-secondary mb-12 max-w-2xl mx-auto text-lg">
-              Harness the power of artificial intelligence to generate strategies, 
-              create compelling content, and build stronger communities.
+              Harness cutting-edge AI to generate strategic insights, create compelling outreach content, 
+              and build thriving communities that amplify your mission.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
               <Link href="/auth/register" className="btn btn-primary text-lg px-8 py-4">
                 <Rocket className="mr-3 h-5 w-5" />
                 Launch Your Journey
@@ -144,13 +156,43 @@ export default function HomePage() {
                 Explore Platform
               </Link>
             </div>
+            
+            {/* Key Features Preview */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+              <div className="glass-card p-4 text-center group hover:bg-primary/5 transition-all duration-300">
+                <Target className="h-8 w-8 text-primary mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="text-small font-medium mb-1">AI Strategy</h3>
+                <p className="text-xs text-secondary">Smart planning</p>
+              </div>
+              <div className="glass-card p-4 text-center group hover:bg-accent/5 transition-all duration-300">
+                <Heart className="h-8 w-8 text-accent mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="text-small font-medium mb-1">Smart Outreach</h3>
+                <p className="text-xs text-secondary">Compelling content</p>
+              </div>
+              <div className="glass-card p-4 text-center group hover:bg-success/5 transition-all duration-300">
+                <MessageCircle className="h-8 w-8 text-success mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="text-small font-medium mb-1">Community</h3>
+                <p className="text-xs text-secondary">Expert network</p>
+              </div>
+              <div className="glass-card p-4 text-center group hover:bg-yellow-500/5 transition-all duration-300">
+                <Users className="h-8 w-8 text-yellow-500 mx-auto mb-2 group-hover:scale-110 transition-transform duration-300" />
+                <h3 className="text-small font-medium mb-1">Mentorship</h3>
+                <p className="text-xs text-secondary">Guided growth</p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Floating Elements */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-float" style={{ animationDelay: '0s' }} />
-        <div className="absolute bottom-20 right-20 w-48 h-48 bg-accent/10 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-10 w-24 h-24 bg-success/10 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-20 left-20 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '0s' }} />
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-accent/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-10 w-24 h-24 bg-success/20 rounded-full blur-3xl animate-float" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-1/3 right-1/4 w-20 h-20 bg-yellow-500/20 rounded-full blur-2xl animate-float" style={{ animationDelay: '6s' }} />
+        
+        {/* Geometric shapes */}
+        <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-primary/30 rotate-45 animate-float" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-1/3 right-1/3 w-6 h-6 bg-accent/30 rounded-full animate-float" style={{ animationDelay: '3s' }} />
+        <div className="absolute top-2/3 left-1/3 w-3 h-3 bg-success/30 animate-float" style={{ animationDelay: '5s' }} />
       </section>
 
       {/* Powered By Section */}
