@@ -142,8 +142,9 @@ export default function HomePage() {
               Transform Your
               <br />
               <span className="text-gradient">Non-Profit Impact</span>
-              <br />
-              <span className="text-2xl md:text-4xl font-normal text-secondary">with AI-Powered Intelligence</span>
+              
+              {/* <br />
+              <span className="text-2xl md:text-4xl font-normal text-secondary">with AI-Powered Intelligence</span> */}
             </h1>
             
             <p className="text-body text-secondary mb-12 max-w-2xl mx-auto text-lg">
