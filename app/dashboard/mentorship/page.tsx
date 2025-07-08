@@ -44,22 +44,17 @@ import {
 interface MentorProfile {
   id: number;
   user_id: number;
-  expertise_areas: string;
-  experience_years: number;
+  expertise: string;
   bio: string;
-  availability: string;
-  user_name?: string;
-  rating?: number;
+  is_available: boolean;
 }
 
 interface Message {
   id: number;
   sender_id: number;
   receiver_id: number;
-  content: string;
-  created_at: string;
-  sender_name?: string;
-  receiver_name?: string;
+  timestamp: string;
+  message: string;
 }
 
 export default function MentorshipPage() {
@@ -79,10 +74,8 @@ export default function MentorshipPage() {
   
   // Opt-in form state
   const [optInForm, setOptInForm] = useState({
-    expertise_areas: '',
-    experience_years: 0,
+    expertise: '',
     bio: '',
-    availability: ''
   });
 
   useEffect(() => {
@@ -121,19 +114,23 @@ export default function MentorshipPage() {
 
     try {
       setOptingIn(true);
+      // Format the mentor data according to what the API expects
+      // The API requires exactly: user_id, bio, and expertise fields
       const mentorData = {
         user_id: user.id,
-        ...optInForm
+        bio: optInForm.bio,
+        expertise: optInForm.expertise // API expects 'expertise', not 'expertise_areas'
       };
       
-      await optInToMentorship(mentorData);
+      console.log('Sending mentor data:', mentorData);
+      
+      const response = await optInToMentorship(mentorData);
+      console.log('Opt-in response:', response);
       
       setShowOptInDialog(false);
       setOptInForm({
-        expertise_areas: '',
-        experience_years: 0,
+        expertise: '',
         bio: '',
-        availability: ''
       });
       
       // Refresh mentors list
@@ -147,7 +144,7 @@ export default function MentorshipPage() {
       console.error('Error opting in to mentorship:', error);
       toast({
         title: "Failed to join mentorship",
-        description: "Could not complete your mentor registration.",
+        description: "Please check the console for details.",
         variant: "destructive",
       });
     } finally {
@@ -161,7 +158,11 @@ export default function MentorshipPage() {
     
     try {
       const data = await getMessages(mentor.user_id.toString());
-      setMessages(Array.isArray(data) ? data : []);
+      // Sort messages by timestamp in ascending order (earliest first)
+      const sortedMessages = Array.isArray(data) ? 
+        [...data].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) : 
+        [];
+      setMessages(sortedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -177,38 +178,59 @@ export default function MentorshipPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!selectedMentor || !newMessage.trim() || !user) {
+    if (!user || !selectedMentor || !newMessage.trim()) {
       return;
     }
-
+    
+    const tempMessage = {
+      id: Date.now(), // Temporary ID
+      sender_id: user.id,
+      receiver_id: selectedMentor.user_id,
+      timestamp: new Date().toISOString(),
+      message: newMessage.trim()
+    };
+    
+    // Optimistically update UI
+    setMessages([...messages, tempMessage]);
+    setNewMessage('');
+    setSuggestedReply('');
+    
     try {
       setSendingMessage(true);
-      
-      const messageData = {
-        sender_id: user.id,
+      // Get the response from sendMessage which contains the newly created message
+      const response = await sendMessage({
         receiver_id: selectedMentor.user_id,
-        content: newMessage.trim()
-      };
-      
-      await sendMessage(messageData);
-      
-      // Refresh messages
-      const updatedMessages = await getMessages(selectedMentor.user_id.toString());
-      setMessages(Array.isArray(updatedMessages) ? updatedMessages : []);
-      
-      setNewMessage('');
-      
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent successfully.",
+        message: tempMessage.message
       });
+      
+      if (response && response.message) {
+        // Replace the temporary message with the server response
+        const updatedMessages = messages.filter(msg => msg.id !== tempMessage.id);
+        // Add the new message from the response
+        const newMessages = [...updatedMessages, response.message];
+        // Sort messages by timestamp in ascending order (earliest first)
+        const sortedMessages = newMessages.sort(
+          (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        );
+        setMessages(sortedMessages);
+      } else {
+        // If we don't get a proper response, fall back to fetching all messages
+        const data = await getMessages(selectedMentor.user_id.toString());
+        const sortedMessages = Array.isArray(data) ? 
+          [...data].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()) : 
+          [];
+        setMessages(sortedMessages);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
         title: "Failed to send message",
-        description: "Could not send your message.",
+        description: "Your message could not be delivered.",
         variant: "destructive",
       });
+      
+      // Remove the optimistic message
+      setMessages(messages.filter(msg => msg.id !== tempMessage.id));
     } finally {
       setSendingMessage(false);
     }
@@ -380,17 +402,11 @@ export default function MentorshipPage() {
                           <div className="flex items-start justify-between">
                             <div>
                               <h3 className="text-subheading group-hover:text-gradient transition-all duration-300">
-                                {mentor.user_name || `Mentor #${mentor.user_id}`}
+                                {`Mentor #${mentor.user_id}`}
                               </h3>
                               <p className="text-small text-secondary">
-                                {mentor.experience_years} years experience
+                                {mentor.is_available ? 'Available' : 'Not available'}
                               </p>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-amber-500 fill-current" />
-                              <span className="text-small font-medium">
-                                {mentor.rating || '4.8'}
-                              </span>
                             </div>
                           </div>
                           
@@ -398,13 +414,7 @@ export default function MentorshipPage() {
                             <div className="flex items-center gap-2">
                               <Award className="h-4 w-4 text-primary" />
                               <span className="text-small">
-                                Expertise: {mentor.expertise_areas}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-success" />
-                              <span className="text-small">
-                                Available: {mentor.availability}
+                                Expertise: {mentor.expertise}
                               </span>
                             </div>
                           </div>
@@ -454,29 +464,14 @@ export default function MentorshipPage() {
                 </Label>
                 <Input
                   id="expertise"
-                  value={optInForm.expertise_areas}
-                  onChange={(e) => setOptInForm({...optInForm, expertise_areas: e.target.value})}
+                  value={optInForm.expertise}
+                  onChange={(e) => setOptInForm({...optInForm, expertise: e.target.value})}
                   placeholder="e.g., Fundraising, Volunteer Management, Grant Writing"
                   className="input"
                   required
                 />
               </div>
-              
-              <div>
-                <Label htmlFor="experience" className="text-small font-medium text-primary mb-2 block">
-                  Years of Experience
-                </Label>
-                <Input
-                  id="experience"
-                  type="number"
-                  min="0"
-                  value={optInForm.experience_years}
-                  onChange={(e) => setOptInForm({...optInForm, experience_years: parseInt(e.target.value) || 0})}
-                  placeholder="5"
-                  className="input"
-                  required
-                />
-              </div>
+            
               
               <div>
                 <Label htmlFor="bio" className="text-small font-medium text-primary mb-2 block">
@@ -491,20 +486,7 @@ export default function MentorshipPage() {
                   required
                 />
               </div>
-              
-              <div>
-                <Label htmlFor="availability" className="text-small font-medium text-primary mb-2 block">
-                  Availability
-                </Label>
-                <Input
-                  id="availability"
-                  value={optInForm.availability}
-                  onChange={(e) => setOptInForm({...optInForm, availability: e.target.value})}
-                  placeholder="e.g., Weekdays 9-5 EST, Weekends"
-                  className="input"
-                  required
-                />
-              </div>
+            
               
               <DialogFooter>
                 <Button
@@ -541,7 +523,7 @@ export default function MentorshipPage() {
           <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
             <DialogHeader>
               <DialogTitle>
-                Chat with {selectedMentor?.user_name || `Mentor #${selectedMentor?.user_id}`}
+                Chat with {`Mentor #${selectedMentor?.user_id}`}
               </DialogTitle>
               <DialogDescription>
                 Get personalized guidance from an experienced mentor.
@@ -564,11 +546,11 @@ export default function MentorshipPage() {
                             : 'bg-surface border border-border'
                         }`}
                       >
-                        <p className="text-small">{message.content}</p>
+                        <p className="text-small">{message.message}</p>
                         <p className={`text-xs mt-1 ${
                           message.sender_id === user?.id ? 'text-white/70' : 'text-secondary'
                         }`}>
-                          {new Date(message.created_at).toLocaleTimeString()}
+                          {new Date(message.timestamp).toLocaleTimeString()}
                         </p>
                       </div>
                     </div>

@@ -6,13 +6,19 @@ import { fetchWithAuth } from '@/lib/api-utils';
  * Opt in to the mentorship program
  */
 export async function optInToMentorship(mentorshipData: any) {
-  return fetchWithAuth('/api/mentorship/optin', {
+  try {
+  const response = await fetchWithAuth('/api/mentorship/optin', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(mentorshipData),
   });
+
+  return response; } catch (error) {
+    console.error('Error opting in to mentorship:', error);
+    throw error;
+  }
 }
 
 /**
@@ -36,6 +42,7 @@ export async function getMentors(filters?: any) {
 
 /**
  * Send a message to another user
+ * @returns The complete response including the created message
  */
 export async function sendMessage(messageData: any) {
   return fetchWithAuth('/api/mentorship/message', {

@@ -36,6 +36,8 @@ export async function fetchWithAuth(
     
     try {
       const errorData = await response.json();
+      console.error('API Error Response:', errorData);
+      
       // Check if errorData is an object with a detail property
       const errorMessage = typeof errorData === 'object' && errorData !== null && 'detail' in errorData
         ? errorData.detail
@@ -43,7 +45,8 @@ export async function fetchWithAuth(
       throw new Error(errorMessage || 'API request failed');
     } catch (e) {
       // If we can't parse the error as JSON, return a generic error
-      throw new Error(`API request failed with status ${response.status}`);
+      console.error(`API Error (${response.status}):`, response.statusText);
+      throw new Error(`API request failed with status ${response.status}: ${response.statusText}`);
     }
   }
 
