@@ -46,7 +46,7 @@ interface ProfileFormData {
 }
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
@@ -189,7 +189,10 @@ export default function ProfilePage() {
       };
       
       const result = await createOrUpdateProfile(profileData);
-      console.log(result)
+      console.log(result);
+      
+      // Refresh user data to update profile_id
+      await refreshUser();
       
       toast({
         title: "Profile saved",

@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   loading: boolean;
 }
 
@@ -41,6 +42,20 @@ export function AuthProvider({
       }
     } catch (error) {
       console.error('Auth check failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const refreshUser = async () => {
+    try {
+      setLoading(true);
+      const userData = await authActions.getCurrentUser();
+      if (userData) {
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
     } finally {
       setLoading(false);
     }
@@ -72,7 +87,7 @@ export function AuthProvider({
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

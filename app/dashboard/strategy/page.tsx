@@ -77,6 +77,7 @@ export default function StrategyPage() {
   ];
 
   const handleGenerate = async () => {
+    console.log(user)
     if (!query.trim()) {
       toast({
         title: "Please enter a strategy query",

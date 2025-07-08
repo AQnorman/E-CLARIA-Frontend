@@ -58,7 +58,7 @@ interface Message {
 }
 
 export default function MentorshipPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [mentors, setMentors] = useState<MentorProfile[]>([]);
@@ -145,11 +145,8 @@ export default function MentorshipPage() {
         bio: '',
       });
       
-      // Update user's mentor status in the AuthContext
-      if (user && typeof user === 'object') {
-        // This will trigger a UI update to show the mentor dashboard instead of "Become a Mentor"
-        user.is_mentor = true;
-      }
+      // Refresh user data to update is_mentor status
+      await refreshUser();
       
       // Refresh mentors list
       await loadMentors();
