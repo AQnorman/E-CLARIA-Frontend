@@ -89,7 +89,8 @@ export default function RegisterPage() {
           {/* Back Button */}
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 text-small text-secondary hover:text-primary transition-all duration-300 group hover:bg-surface/50 px-3 py-2 rounded-lg"
+            className="inline-flex items-center gap-2 text-small text-secondary hover:text-primary transition-all duration-300 group cursor-pointer hover:bg-surface/50 px-3 py-2 rounded-lg relative z-10 no-underline"
+            style={{ textDecoration: 'none' }}
           >
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Back to home</span>

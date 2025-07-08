@@ -468,6 +468,24 @@ body {
   color: var(--text-primary);
 }
 
+/* Ensure links are clickable */
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.no-underline {
+  text-decoration: none !important;
+}
+
+.no-underline:hover {
+  text-decoration: none !important;
+}
+
 
 /* Interactive Grid Background */
 .interactive-grid {
