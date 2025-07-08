@@ -121,6 +121,17 @@ export default function HomePage() {
       <section id="home" className="min-h-screen flex items-center justify-center pt-16 relative overflow-hidden">
         <div className="container text-center relative z-10">
           <div className="animate-slide-up">
+            {/* Hackathon Badge */}
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 backdrop-blur-sm">
+                <div className="w-6 h-6 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                  <Zap className="h-3 w-3 text-white" />
+                </div>
+                <span className="text-gradient font-semibold text-sm tracking-wide">RAISE YOUR HACK 2025</span>
+                <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
+              </div>
+            </div>
+            
             {/* Brand Title */}
             <div className="mb-8">
                 <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA</span>
@@ -164,6 +175,78 @@ export default function HomePage() {
         <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-primary/30 rotate-45 animate-float" style={{ animationDelay: '1s' }} />
         <div className="absolute bottom-1/3 right-1/3 w-6 h-6 bg-accent/30 rounded-full animate-float" style={{ animationDelay: '3s' }} />
         <div className="absolute top-2/3 left-1/3 w-3 h-3 bg-success/30 animate-float" style={{ animationDelay: '5s' }} />
+      </section>
+
+      {/* Hackathon Participation Section */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="container">
+          <div className="glass-card p-8 md:p-12 text-center relative overflow-hidden">
+            <div className="relative z-10">
+              {/* Header */}
+              <div className="mb-8">
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 mb-4">
+                  <Sparkles className="h-4 w-4 text-yellow-500" />
+                  <span className="text-yellow-500 font-medium text-sm">HACKATHON SUBMISSION</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                  Participating in <span className="text-gradient">RAISE YOUR HACK 2025</span>
+                </h2>
+                <p className="text-secondary max-w-2xl mx-auto">
+                  E-CLARIA-AI is our innovative submission to RAISE YOUR HACK 2025, showcasing the power of AI 
+                  in transforming non-profit organizations and amplifying their social impact.
+                </p>
+              </div>
+
+              {/* Key Highlights */}
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="p-6 rounded-xl bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Brain className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-2">AI-Powered Innovation</h3>
+                  <p className="text-sm text-secondary">Leveraging cutting-edge AI to solve real-world challenges in the non-profit sector</p>
+                </div>
+                
+                <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Heart className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Social Impact</h3>
+                  <p className="text-sm text-secondary">Empowering non-profits to maximize their reach and effectiveness in creating positive change</p>
+                </div>
+                
+                <div className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/20">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Rocket className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Future-Ready</h3>
+                  <p className="text-sm text-secondary">Building scalable solutions that adapt to the evolving needs of modern non-profit organizations</p>
+                </div>
+              </div>
+
+              {/* Event Details */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-surface/50 border border-border/50">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-sm font-medium">Live Submission</span>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-surface/50 border border-border/50">
+                  <Globe className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Global Competition</span>
+                </div>
+                <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-surface/50 border border-border/50">
+                  <Users className="h-4 w-4 text-accent" />
+                  <span className="text-sm font-medium">Team Innovation</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl" />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-gradient-to-r from-yellow-500/5 to-orange-500/5 rounded-full blur-3xl" />
+          </div>
+        </div>
       </section>
 
       {/* Powered By Section */}
