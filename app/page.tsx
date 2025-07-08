@@ -153,6 +153,37 @@ export default function HomePage() {
         <div className="absolute top-1/2 left-10 w-24 h-24 bg-success/10 rounded-full blur-xl animate-float" style={{ animationDelay: '4s' }} />
       </section>
 
+      {/* Powered By Section */}
+      <section className="py-12 border-b border-border/30">
+        <div className="container">
+          <div className="text-center mb-8">
+            <p className="text-small text-secondary mb-6">Powered by</p>
+          </div>
+          
+          <div className="flex items-center justify-center gap-12 md:gap-16">
+            {/* Vultr */}
+            <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+              </div>
+              <span className="text-body font-medium">Vultr</span>
+            </div>
+            
+            {/* Groq */}
+            <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <span className="text-body font-medium">Groq</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section - Bento Grid */}
       <section id="features" className="section">
         <div className="container">
@@ -246,78 +277,6 @@ export default function HomePage() {
               <div className="absolute bottom-10 right-10 w-32 h-32 bg-accent rounded-full blur-xl" />
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-success rounded-full blur-xl" />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Powered By Section */}
-      <section className="section-sm border-t border-border/50">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-subheading mb-4">
-              Powered by <span className="text-gradient">Industry Leaders</span>
-            </h2>
-            <p className="text-body text-secondary max-w-2xl mx-auto">
-              E-CLARIA-AI is built on cutting-edge infrastructure and AI technology from trusted partners
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Vultr */}
-            <div className="glass-card p-8 text-center group hover:bg-surface/50 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg className="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                </svg>
-              </div>
-              <h3 className="text-subheading mb-3 group-hover:text-gradient transition-all duration-300">
-                Vultr Cloud Infrastructure
-              </h3>
-              <p className="text-body text-secondary mb-4">
-                High-performance cloud computing with global reach, providing reliable and scalable infrastructure for our platform.
-              </p>
-              <div className="flex items-center justify-center gap-4 text-small">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="text-secondary">99.9% Uptime</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                  <span className="text-secondary">Global CDN</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Groq */}
-            <div className="glass-card p-8 text-center group hover:bg-surface/50 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <svg className="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                </svg>
-              </div>
-              <h3 className="text-subheading mb-3 group-hover:text-gradient transition-all duration-300">
-                Groq AI Processing
-              </h3>
-              <p className="text-body text-secondary mb-4">
-                Lightning-fast AI inference powered by Groq's revolutionary Language Processing Units for instant responses.
-              </p>
-              <div className="flex items-center justify-center gap-4 text-small">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-accent rounded-full" />
-                  <span className="text-secondary">Ultra-Fast AI</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-success rounded-full" />
-                  <span className="text-secondary">Real-Time</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-center mt-12">
-            <p className="text-small text-secondary">
-              Built with enterprise-grade technology for maximum performance and reliability
-            </p>
           </div>
         </div>
       </section>
