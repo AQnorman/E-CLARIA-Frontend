@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { login as loginAction, register as registerAction, logout as logoutAction } from '@/actions/auth';
 
 interface User {
   id: number;
@@ -28,8 +27,13 @@ export function AuthProvider({
   initialUser: User | null;
 }) {
   const [user, setUser] = useState<User | null>(initialUser);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  // Check authentication status on mount
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const checkAuth = async () => {
     try {
@@ -42,6 +46,8 @@ export function AuthProvider({
         const data = await response.json();
         if (data.success && data.user) {
           setUser(data.user);
+        } else {
+          setUser(null);
         }
       } else {
         setUser(null);
@@ -56,7 +62,20 @@ export function AuthProvider({
 
   const login = async (email: string, password: string) => {
     try {
-      const data = await loginAction(email, password);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
       
       if (data.success && data.user) {
         setUser(data.user);
