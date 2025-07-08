@@ -163,28 +163,32 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-12 md:gap-16">
             {/* Vultr */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <svg className="h-10 w-auto" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Vultr Logo */}
-                <path d="M8 4L16 20H24L16 4H8Z" fill="currentColor" className="text-blue-500"/>
-                <path d="M0 20L8 4H16L8 20H0Z" fill="currentColor" className="text-blue-400"/>
-                <path d="M16 20L24 4H32L24 20H16Z" fill="currentColor" className="text-blue-600"/>
-                <text x="40" y="18" className="fill-current text-foreground text-sm font-semibold" fontFamily="system-ui">
-                  Vultr
-                </text>
+              <svg className="h-12 w-auto" id="logo__on-dark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 217.5 52">
+                <defs>
+                  <style>{`.cls-1{fill:currentColor;}.cls-2{fill:#007bfc;}.cls-3{fill:#51b9ff;}`}</style>
+                </defs>
+                <title>Vultr</title>
+                <g id="text">
+                  <path className="cls-1" d="M217.3,37.75l-5.47-9.43A8.5,8.5,0,0,0,208.5,12h-12a1.5,1.5,0,0,0-1.5,1.5v25a1.5,1.5,0,0,0,1.5,1.5h1a1.5,1.5,0,0,0,1.5-1.5V29h8.74l5.95,10.25A1.49,1.49,0,0,0,215,40h1a1.5,1.5,0,0,0,1.5-1.5A1.48,1.48,0,0,0,217.3,37.75ZM199,16h9.5a4.5,4.5,0,0,1,0,9H199Z"/>
+                  <path className="cls-1" d="M186.5,12h-21a1.5,1.5,0,0,0-1.5,1.5v1a1.5,1.5,0,0,0,1.5,1.5H174V38.5a1.5,1.5,0,0,0,1.5,1.5h1a1.5,1.5,0,0,0,1.5-1.5V16h8.5a1.5,1.5,0,0,0,1.5-1.5v-1A1.5,1.5,0,0,0,186.5,12Z"/>
+                  <path className="cls-1" d="M164.5,36H151V13.5a1.5,1.5,0,0,0-1.5-1.5h-1a1.5,1.5,0,0,0-1.5,1.5v25a1.5,1.5,0,0,0,1.5,1.5h16a1.5,1.5,0,0,0,1.5-1.5v-1A1.5,1.5,0,0,0,164.5,36Z"/>
+                  <path className="cls-1" d="M139,13.5a1.5,1.5,0,0,0-1.5-1.5h-1a1.5,1.5,0,0,0-1.5,1.5V29a7.5,7.5,0,0,1-15,0V13.5a1.5,1.5,0,0,0-1.5-1.5h-1a1.5,1.5,0,0,0-1.5,1.5V29a11.5,11.5,0,0,0,23,0Z"/>
+                  <path className="cls-1" d="M108.5,12h-1a1.5,1.5,0,0,0-1.39.94L97.5,34.59,88.84,12.94A1.5,1.5,0,0,0,87.45,12h-1A1.5,1.5,0,0,0,85,13.5a1.55,1.55,0,0,0,.11.56l10,25A1.49,1.49,0,0,0,96.5,40h2a1.49,1.49,0,0,0,1.39-.94l10-25a1.55,1.55,0,0,0,.11-.56A1.5,1.5,0,0,0,108.5,12Z"/>
+                </g>
+                <g id="sygnet">
+                  <path className="cls-2" d="M20.9,1.4A3,3,0,0,0,18.37,0H3A3,3,0,0,0,.46,4.6l3.15,5L24.06,6.4Z"/>
+                  <path className="cls-3" d="M24.06,6.4A3,3,0,0,0,21.52,5H6.15A3,3,0,0,0,3.61,9.6L8,16.6l20.44-3.2Z"/>
+                  <path className="cls-1" d="M8,16.6A2.91,2.91,0,0,1,7.57,15a3,3,0,0,1,3-3H25.93a3,3,0,0,1,2.54,1.4L42.22,35.21a3,3,0,0,1,0,3.2L34.54,50.6a3,3,0,0,1-5.08,0Z"/>
+                  <path className="cls-1" d="M46.78,23.13a3,3,0,0,0,5.07,0l2.65-4.19,5-8a3,3,0,0,0,0-3.21l-4-6.34A3,3,0,0,0,53,0H37.63a3,3,0,0,0-2.54,4.6Z"/>
+                </g>
               </svg>
             </div>
             
             {/* Groq */}
             <div className="flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-              <svg className="h-10 w-auto" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Groq Logo */}
-                <circle cx="8" cy="16" r="6" fill="currentColor" className="text-orange-500"/>
-                <circle cx="16" cy="8" r="4" fill="currentColor" className="text-orange-400"/>
-                <circle cx="16" cy="24" r="4" fill="currentColor" className="text-red-500"/>
-                <circle cx="24" cy="16" r="3" fill="currentColor" className="text-red-400"/>
-                <text x="34" y="18" className="fill-current text-foreground text-sm font-semibold" fontFamily="system-ui">
-                  Groq
-                </text>
+              <svg className="h-12 w-auto text-foreground" fill="currentColor" fillRule="evenodd" viewBox="0 0 64 24" xmlns="http://www.w3.org/2000/svg">
+                <title>Groq</title>
+                <path d="M37.925 2.039c4.142 0 7.509 3.368 7.509 7.528l-.004.244c-.128 4.047-3.437 7.284-7.505 7.284-4.15 0-7.509-3.368-7.509-7.528s3.36-7.528 7.509-7.528zm-11.144-.023c.26 0 .522.015.775.046l.015-.008a7.464 7.464 0 012.922.969L29.09 5.468a4.619 4.619 0 00-2.309-.6h-.253l-.253.016c-.338.03-.66.092-.982.177-.621.169-1.196.469-1.703.869a4.062 4.062 0 00-1.418 2.322l-.04.234-.03.235c-.007.077-.023.161-.023.238l-.014 2.713v2.593l-.016 2.522h-2.815l-.03-4.973V8.852c0-.139.015-.262.022-.392.023-.262.062-.523.115-.777.1-.523.269-1.03.491-1.515a6.998 6.998 0 011.948-2.484 7.465 7.465 0 012.754-1.391c.49-.131.99-.216 1.495-.254.123-.008.253-.023.376-.023h.376zM37.925 4.86a4.7 4.7 0 00-4.694 4.706 4.7 4.7 0 004.694 4.706 4.7 4.7 0 004.694-4.706l-.005-.216a4.7 4.7 0 00-4.689-4.49zM9.578 2C5.428 1.96 2.038 5.298 2 9.458c-.038 4.16 3.29 7.559 7.44 7.597h2.608v-2.822h-2.47c-2.592.031-4.717-2.053-4.748-4.652a4.7 4.7 0 014.64-4.76h.108c2.52 0 4.577 1.992 4.696 4.49l.005.216v6.936c0 2.576-2.093 4.676-4.655 4.706a4.663 4.663 0 01-3.267-1.376l-1.994 2A7.46 7.46 0 009.57 24h.1c4.096-.062 7.386-3.391 7.409-7.497V9.35c-.1-4.09-3.428-7.35-7.501-7.35zm44.929.038c-4.15 0-7.509 3.368-7.509 7.528s3.36 7.528 7.509 7.528h2.57v-2.822h-2.57a4.7 4.7 0 01-4.694-4.706 4.7 4.7 0 014.694-4.706A4.707 4.707 0 0159.16 8.94l.024.22v14.456H62V9.566c-.008-4.152-3.352-7.527-7.493-7.527z"></path>
               </svg>
             </div>
           </div>
