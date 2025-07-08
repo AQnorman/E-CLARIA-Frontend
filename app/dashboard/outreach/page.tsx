@@ -22,14 +22,18 @@ import {
   Brain
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function OutreachPage() {
   const [goal, setGoal] = useState('');
   const [audience, setAudience] = useState('');
   const [tone, setTone] = useState('professional');
   const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
+  const [contentId, setContentId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const contentTypes = [
     {
@@ -75,18 +79,27 @@ export default function OutreachPage() {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to generate outreach content.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const outreachData = {
-        goal,
-        audience,
-        tone
+        profile_id: user.id,
+        goal
       };
-      
       // Call the server action to generate content
       const result = await generateOutreachContent(outreachData);
       
       // Use the result from the server action
+      setContentId(result.id);
+      setTitle(result.title);
       setContent(result.content);
       
       toast({
@@ -256,7 +269,7 @@ export default function OutreachPage() {
           {/* Output Section */}
           <div className="floating-card p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-subheading">Generated Content</h2>
+              <h2 className="text-subheading">{title || "Generated Content"}</h2>
               {content && (
                 <div className="flex gap-3">
                   <Button
@@ -279,8 +292,9 @@ export default function OutreachPage() {
             </div>
             
             {content ? (
-              <div className="glass-card p-6 max-h-[600px] overflow-y-auto">
+              <div className="glass-card p-6" style={{ maxHeight: 'calc(100vh - 0px)', overflowY: 'auto' }}>
                 <div className="prose prose-sm max-w-none">
+                  {contentId && <div className="text-xs text-secondary mb-2">Content ID: {contentId}</div>}
                   <pre className="whitespace-pre-wrap text-small leading-relaxed font-normal text-primary">
                     {content}
                   </pre>

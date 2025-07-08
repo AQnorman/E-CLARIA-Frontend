@@ -37,6 +37,7 @@ export async function login(email: string, password: string) {
   return data;
 }
 
+
 /**
  * Register a new user
  */

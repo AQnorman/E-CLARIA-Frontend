@@ -29,12 +29,34 @@ export async function postAnswer(answerData: any) {
 }
 
 /**
- * Get list of questions with optional search and filters
+ * Get list of questions with optional search, filters, and pagination
  */
-export async function getQuestions(params?: { search?: string, filter?: string }) {
+export async function getQuestions(params?: { 
+  search?: string, 
+  filter?: string, 
+  page?: number, 
+  pageSize?: number 
+}) {
   const queryParams = new URLSearchParams();
-  if (params?.search) queryParams.append('search', params.search);
-  if (params?.filter) queryParams.append('filter', params.filter);
+  
+  // Add search parameter if provided
+  if (params?.search && params.search.trim()) {
+    queryParams.append('search', params.search.trim());
+  }
+  
+  // Add filter parameter if provided
+  if (params?.filter && params.filter.trim()) {
+    queryParams.append('filter', params.filter.trim());
+  }
+  
+  // Add pagination parameters
+  if (params?.page) {
+    queryParams.append('page', params.page.toString());
+  }
+  
+  if (params?.pageSize) {
+    queryParams.append('page_size', params.pageSize.toString());
+  }
   
   const url = `/api/community/questions${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 

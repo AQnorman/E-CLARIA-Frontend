@@ -2,11 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   getQuestions, 
@@ -98,6 +106,8 @@ export default function CommunityPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [answerToDelete, setAnswerToDelete] = useState<number | null>(null);
   
+  // This function was moved to line ~550
+  
   // Form states
   const [newQuestion, setNewQuestion] = useState({
     title: '',
@@ -113,9 +123,9 @@ export default function CommunityPage() {
 
   useEffect(() => {
     loadQuestions();
-    if (user) {
-      loadUserPoints();
-    }
+    // if (user) {
+    //   loadUserPoints();
+    // }
     
     // Check for mobile view
     const handleResize = () => {
@@ -130,65 +140,143 @@ export default function CommunityPage() {
   const loadQuestions = async (search?: string, filterParam?: string, page: number = 1) => {
     try {
       setLoading(true);
+      
+      // Clear selected question when performing a new search
+      if ((search || filterParam) && page === 1) {
+        setSelectedQuestion(null);
+        setAnswers([]);
+      }
+      
       const params: { search?: string, filter?: string, page?: number, pageSize?: number } = {
         page,
         pageSize: pagination.pageSize
       };
-      if (search) params.search = search;
-      if (filterParam) params.filter = filterParam;
+      
+      // Only add search/filter params if they have content
+      if (search && search.trim()) params.search = search.trim();
+      if (filterParam && filterParam.trim()) params.filter = filterParam.trim();
       
       const response = await getQuestions(params);
       
-      // Assuming the API returns { data: Question[], totalCount: number }
-      // If your API response is different, adjust accordingly
-      const { data, totalCount } = response;
-      setQuestions(data || []);
+      // Safely extract data and totalCount from response
+      const data = Array.isArray(response) ? response : response?.data || [];
+      const totalCount = response?.totalCount || data.length || 0;
       
-      // Update pagination
+      setQuestions(data);
+      
+      // Update pagination with safe fallbacks
       setPagination(prev => ({
         ...prev,
         currentPage: page,
-        totalPages: Math.ceil((totalCount || data.length) / prev.pageSize)
+        totalPages: Math.max(1, Math.ceil(totalCount / prev.pageSize))
       }));
+      
+
+      // Show search/filter result message
+      if ((search || filterParam) && page === 1) {
+        const searchMsg = search ? `"${search}"` : '';
+        const filterMsg = filterParam ? `tag "${filterParam}"` : '';
+        const connector = search && filterParam ? ' and ' : '';
+        
+        toast({
+          title: `Search Results`,
+          description: `Found ${totalCount} question${totalCount !== 1 ? 's' : ''} matching ${searchMsg}${connector}${filterMsg}`,
+          variant: "default",
+        });
+      }
     } catch (error) {
+      console.error('Error loading questions:', error);
       toast({
         title: "Failed to load questions",
-        description: "Could not retrieve community questions.",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? String(error.message)
+          : "Could not retrieve community questions.",
         variant: "destructive",
       });
+      
+      // Reset questions to empty array on error
+      setQuestions([]);
     } finally {
       setLoading(false);
     }
   };
 
   const loadUserPoints = async () => {
-    if (!user) return;
+    if (!user?.id) {
+      setUserPoints(0);
+      return;
+    }
     
     try {
       const data = await getUserPoints(user.id.toString());
-      setUserPoints(data.score);
+      
+      // Check if data has points property and it's a number
+      if (data && typeof data.points === 'number') {
+        setUserPoints(data.points);
+      } else {
+        console.warn('Invalid user points data format:', data);
+        setUserPoints(0);
+      }
     } catch (error) {
-      console.error("Failed to load user points:", error);
+      console.error('Failed to load user points:', error);
+      // Don't show a toast for this as it's not critical to the user experience
+      // Just silently set points to 0
+      setUserPoints(0);
     }
   };
 
   const handleSearch = () => {
-    loadQuestions(searchQuery, filter, 1); // Reset to first page when searching
+    // Reset to first page when searching
+    loadQuestions(searchQuery, filter, 1);
+  };
+  
+  const clearSearch = () => {
+    setSearchQuery('');
+    setFilter('');
+    loadQuestions('', '', 1);
   };
   
   const handlePageChange = (newPage: number) => {
-    if (newPage < 1 || newPage > pagination.totalPages) return;
+    if (newPage < 1 || newPage > pagination.totalPages) {
+      return; // Prevent invalid page navigation
+    }
     loadQuestions(searchQuery, filter, newPage);
+  };
+  
+  // Helper function to generate pagination range
+  const getPaginationRange = () => {
+    const range = [];
+    const maxButtons = 5; // Maximum number of page buttons to show
+    const currentPage = pagination.currentPage;
+    const totalPages = pagination.totalPages;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+    
+    // Adjust if we're near the end
+    if (endPage - startPage + 1 < maxButtons) {
+      startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      range.push(i);
+    }
+    
+    return range;
   };
 
   const handleSelectQuestion = async (question: Question) => {
     setSelectedQuestion(question);
     setSuggestedAnswer('');
-    
+    setAnswers([]); // Clear previous answers while loading
+  
     try {
       const data = await getAnswers(question.id.toString());
-      setAnswers(data);
+      // Ensure data is an array before setting
+      setAnswers(Array.isArray(data) ? data : []);
     } catch (error) {
+      console.error('Error loading answers:', error);
+      setAnswers([]); // Ensure answers is always an array
       toast({
         title: "Failed to load answers",
         description: "Could not retrieve answers for this question.",
@@ -199,15 +287,7 @@ export default function CommunityPage() {
 
   const handlePostQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to post a question.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    
     if (!newQuestion.title.trim() || !newQuestion.content.trim()) {
       toast({
         title: "Missing information",
@@ -216,31 +296,68 @@ export default function CommunityPage() {
       });
       return;
     }
-
+    
+    // Check if user is authenticated
+    if (!user?.id) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to post a question.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       setPostingQuestion(true);
+      
       const questionData = {
-        user_id: user.id,
-        title: newQuestion.title,
-        content: newQuestion.content,
-        tags: newQuestion.tags
+        title: newQuestion.title.trim(),
+        content: newQuestion.content.trim(),
+        tags: newQuestion.tags.trim(),
+        user_id: user.id
       };
       
-      const result = await postQuestion(questionData);
+      const response = await postQuestion(questionData);
+      
+      // Check if posting was successful
+      if (!response || response.error) {
+        throw new Error(response?.error || 'Failed to post question');
+      }
+      
+      // Reset form
+      setNewQuestion({
+        title: '',
+        content: '',
+        tags: ''
+      });
+      setShowNewQuestionForm(false);
+      
+      // Refresh questions list
+      try {
+        await loadQuestions();
+      } catch (refreshError) {
+        console.error('Error refreshing questions:', refreshError);
+        // Don't block the success message if refresh fails
+        toast({
+          title: "Question posted but couldn't refresh",
+          description: "Your question was posted but we couldn't refresh the list.",
+          variant: "default",
+        });
+        setPostingQuestion(false);
+        return;
+      }
       
       toast({
         title: "Question posted",
         description: "Your question has been posted successfully.",
       });
-      
-      // Reset form and refresh questions
-      setNewQuestion({ title: '', content: '', tags: '' });
-      setShowNewQuestionForm(false);
-      loadQuestions();
     } catch (error) {
+      console.error('Error posting question:', error);
       toast({
         title: "Failed to post question",
-        description: "An error occurred while posting your question.",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? String(error.message)
+          : "Could not post your question. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -250,50 +367,66 @@ export default function CommunityPage() {
 
   const handlePostAnswer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !selectedQuestion) {
+    
+    if (!selectedQuestion || !newAnswer.trim()) {
       toast({
-        title: "Error",
-        description: "Please log in and select a question to answer.",
+        title: "Missing information",
+        description: "Please provide an answer.",
         variant: "destructive",
       });
       return;
     }
-
-    if (!newAnswer.trim()) {
+    
+    if (!user?.id) {
       toast({
-        title: "Empty answer",
-        description: "Please provide content for your answer.",
+        title: "Authentication required",
+        description: "You must be logged in to post an answer.",
         variant: "destructive",
       });
       return;
     }
-
+    
     try {
       setPostingAnswer(true);
+      
       const answerData = {
-        user_id: user.id,
+        content: newAnswer,
         question_id: selectedQuestion.id,
-        content: newAnswer
+        user_id: user.id
       };
       
-      const result = await postAnswer(answerData);
+      await postAnswer(answerData);
+      
+      // Refresh answers
+      try {
+        const updatedAnswers = await getAnswers(selectedQuestion.id.toString());
+        // Ensure data is an array before setting
+        setAnswers(Array.isArray(updatedAnswers) ? updatedAnswers : []);
+      } catch (refreshError) {
+        console.error('Error refreshing answers:', refreshError);
+        // Don't reset the form if we couldn't refresh - the answer might have been posted
+        toast({
+          title: "Answer posted but couldn't refresh",
+          description: "Your answer was posted but we couldn't refresh the list.",
+          variant: "default",
+        });
+        setPostingAnswer(false);
+        return;
+      }
+      
+      // Reset form
+      setNewAnswer('');
+      setShowAnswerForm(false);
       
       toast({
         title: "Answer posted",
         description: "Your answer has been posted successfully.",
       });
-      
-      // Reset form and refresh answers
-      setNewAnswer('');
-      setShowAnswerForm(false);
-      
-      // Refresh answers for the current question
-      const updatedAnswers = await getAnswers(selectedQuestion.id.toString());
-      setAnswers(updatedAnswers);
     } catch (error) {
+      console.error('Error posting answer:', error);
       toast({
         title: "Failed to post answer",
-        description: "An error occurred while posting your answer.",
+        description: "Could not post your answer. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -305,32 +438,57 @@ export default function CommunityPage() {
     if (!user) {
       toast({
         title: "Authentication required",
-        description: "Please log in to upvote answers.",
+        description: "You must be logged in to upvote answers.",
         variant: "destructive",
       });
       return;
     }
-
+    
+    // Prevent upvoting if already in progress
+    if (upvoting !== null) {
+      return;
+    }
+    
     try {
       setUpvoting(answerId);
-      await upvoteAnswer(answerId.toString());
       
-      // Update the answers list with the new upvote count
-      const updatedAnswers = answers.map(answer => {
+      // Check if answerId is valid
+      if (!answerId || isNaN(answerId)) {
+        throw new Error('Invalid answer ID');
+      }
+      
+      const response = await upvoteAnswer(answerId.toString());
+      
+      // Check if the upvote was successful
+      if (!response || response.error) {
+        throw new Error(response?.error || 'Failed to upvote');
+      }
+      
+      // Update the answer in the local state
+      setAnswers(prev => prev.map(answer => {
         if (answer.id === answerId) {
           return { ...answer, upvotes: answer.upvotes + 1 };
         }
         return answer;
+      }));
+      
+      // Update user points
+      if (user) {
+        loadUserPoints();
+      }
+      
+      toast({
+        title: "Upvoted",
+        description: "You've successfully upvoted this answer.",
+        variant: "default",
       });
-      
-      setAnswers(updatedAnswers);
-      
-      // Refresh user points
-      loadUserPoints();
     } catch (error) {
+      console.error('Error upvoting answer:', error);
       toast({
         title: "Failed to upvote",
-        description: "An error occurred while upvoting the answer.",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? String(error.message)
+          : "Could not upvote this answer.",
         variant: "destructive",
       });
     } finally {
@@ -339,16 +497,38 @@ export default function CommunityPage() {
   };
 
   const handleGetSuggestion = async () => {
-    if (!selectedQuestion) return;
+    if (!selectedQuestion) {
+      toast({
+        title: "No question selected",
+        description: "Please select a question first.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       setLoadingSuggestion(true);
-      const result = await getSuggestedAnswer(selectedQuestion.id.toString());
-      setSuggestedAnswer(result.suggested_answer);
+      const data = await getSuggestedAnswer(selectedQuestion.id.toString());
+      
+      // Check if data and suggestion exist
+      if (data && typeof data.suggested_answer === 'string') {
+        setSuggestedAnswer(data.suggested_answer);
+      } else {
+        // Handle case where data structure is not as expected
+        console.error('Unexpected suggestion data format:', data);
+        setSuggestedAnswer('');
+        toast({
+          title: "Invalid suggestion format",
+          description: "Received an invalid suggestion format from the server.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
+      console.error('Error getting suggestion:', error);
+      setSuggestedAnswer('');
       toast({
         title: "Failed to get suggestion",
-        description: "Could not retrieve AI-suggested answer.",
+        description: "Could not generate a suggested answer.",
         variant: "destructive",
       });
     } finally {
@@ -369,22 +549,58 @@ export default function CommunityPage() {
   };
 
   const handleDeleteAnswer = async () => {
-    if (!answerToDelete) return;
+    if (!answerToDelete) {
+      setShowDeleteConfirm(false);
+      return;
+    }
+    
+    // Check if user is authenticated
+    if (!user?.id) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to delete answers.",
+        variant: "destructive",
+      });
+      setShowDeleteConfirm(false);
+      setAnswerToDelete(null);
+      return;
+    }
+    
+    // Check if the answer belongs to the current user
+    const answerToDeleteObj = answers.find(answer => answer.id === answerToDelete);
+    if (!answerToDeleteObj || answerToDeleteObj.user_id !== user.id) {
+      toast({
+        title: "Permission denied",
+        description: "You can only delete your own answers.",
+        variant: "destructive",
+      });
+      setShowDeleteConfirm(false);
+      setAnswerToDelete(null);
+      return;
+    }
     
     try {
-      await deleteAnswer(answerToDelete);
+      const response = await deleteAnswer(answerToDelete);
       
-      // Remove the answer from the list
-      setAnswers(answers.filter(a => a.id !== answerToDelete));
+      // Check if deletion was successful
+      if (!response || response.error) {
+        throw new Error(response?.error || 'Failed to delete answer');
+      }
+      
+      // Remove the deleted answer from the state
+      setAnswers(prev => prev.filter(answer => answer.id !== answerToDelete));
       
       toast({
         title: "Answer deleted",
-        description: "Your answer has been removed.",
+        description: "Your answer has been deleted successfully.",
       });
     } catch (error) {
+      console.error('Error deleting answer:', error);
       toast({
         title: "Failed to delete answer",
-        description: "Could not delete your answer.",
+        description: typeof error === 'object' && error !== null && 'message' in error 
+          ? String(error.message)
+          : "Could not delete your answer.",
         variant: "destructive",
       });
     } finally {
@@ -392,6 +608,37 @@ export default function CommunityPage() {
       setAnswerToDelete(null);
     }
   };
+
+  // Delete Confirmation Dialog
+  const DeleteConfirmationDialog = (
+    <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Delete Answer</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this answer? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowDeleteConfirm(false);
+              setAnswerToDelete(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteAnswer}
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <DashboardLayout>
@@ -411,12 +658,14 @@ export default function CommunityPage() {
               </div>
             </div>
             
+            {/* User points display temporarily commented out
             {user && (
               <div className="flex items-center gap-2 mt-2">
                 <Award className="h-4 w-4 text-amber-500" />
                 <span className="text-small font-medium">Your Points: {userPoints}</span>
               </div>
             )}
+            */}
           </div>
           
           {/* Background decoration */}
@@ -443,28 +692,93 @@ export default function CommunityPage() {
               {/* Search and Filter */}
               <div className="space-y-4 mb-6">
                 <div className="flex gap-2">
-                  <Input
-                    placeholder="Search questions..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="input flex-1"
-                  />
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Search questions..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="input w-full pr-8"
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    {searchQuery && (
+                      <button 
+                        onClick={() => {
+                          setSearchQuery('');
+                          if (!filter) loadQuestions('', '', pagination.currentPage);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-secondary hover:text-primary"
+                        type="button"
+                        aria-label="Clear search"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   <Button onClick={handleSearch} className="btn btn-secondary">
                     <Search className="h-4 w-4" />
                   </Button>
                 </div>
                 
                 <div className="flex gap-2">
-                  <Input
-                    placeholder="Filter by tag (e.g., fundraising)"
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    className="input flex-1"
-                  />
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Filter by tag (e.g., fundraising)"
+                      value={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                      className="input w-full pr-8"
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    {filter && (
+                      <button 
+                        onClick={() => {
+                          setFilter('');
+                          if (!searchQuery) loadQuestions('', '', pagination.currentPage);
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-secondary hover:text-primary"
+                        type="button"
+                        aria-label="Clear filter"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                   <Button onClick={handleSearch} className="btn btn-secondary">
                     <Filter className="h-4 w-4" />
                   </Button>
                 </div>
+                
+                {(searchQuery || filter) && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-2">
+                      {searchQuery && (
+                        <div className="bg-secondary/20 text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                          <Search className="h-3 w-3" />
+                          <span>{searchQuery}</span>
+                        </div>
+                      )}
+                      {filter && (
+                        <div className="bg-secondary/20 text-xs px-2 py-1 rounded-md flex items-center gap-1">
+                          <Filter className="h-3 w-3" />
+                          <span>{filter}</span>
+                        </div>
+                      )}
+                    </div>
+                    <Button 
+                      onClick={clearSearch} 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-xs h-7"
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                )}
               </div>
               
               {/* New Question Form */}
@@ -580,40 +894,65 @@ export default function CommunityPage() {
                       <Button
                         onClick={() => handlePageChange(1)}
                         disabled={pagination.currentPage === 1}
-                        className="btn btn-ghost h-8 w-8 p-0"
                         size="sm"
+                        variant="outline"
+                        className="hidden sm:flex"
+                        title="First Page"
                       >
-                        <span>«</span>
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        <ChevronLeft className="h-4 w-4" />
                       </Button>
+                      
                       <Button
                         onClick={() => handlePageChange(pagination.currentPage - 1)}
                         disabled={pagination.currentPage === 1}
-                        className="btn btn-ghost h-8 w-8 p-0"
                         size="sm"
+                        variant="outline"
+                        title="Previous Page"
                       >
-                        <span>&lt;</span>
+                        <ChevronLeft className="h-4 w-4" />
                       </Button>
                       
-                      <span className="text-small text-secondary">
-                        Page {pagination.currentPage} of {pagination.totalPages}
-                      </span>
+                      {/* Page numbers */}
+                      <div className="flex gap-1">
+                        {getPaginationRange().map(page => (
+                          <Button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            size="sm"
+                            variant={pagination.currentPage === page ? "default" : "outline"}
+                            className={`${pagination.currentPage === page ? 'bg-primary text-primary-foreground' : ''}`}
+                          >
+                            {page}
+                          </Button>
+                        ))}
+                      </div>
                       
                       <Button
                         onClick={() => handlePageChange(pagination.currentPage + 1)}
                         disabled={pagination.currentPage === pagination.totalPages}
-                        className="btn btn-ghost h-8 w-8 p-0"
                         size="sm"
+                        variant="outline"
+                        title="Next Page"
                       >
-                        <span>&gt;</span>
+                        <ChevronRight className="h-4 w-4" />
                       </Button>
+                      
                       <Button
                         onClick={() => handlePageChange(pagination.totalPages)}
                         disabled={pagination.currentPage === pagination.totalPages}
-                        className="btn btn-ghost h-8 w-8 p-0"
                         size="sm"
+                        variant="outline"
+                        className="hidden sm:flex"
+                        title="Last Page"
                       >
-                        <span>»</span>
+                        <ChevronRight className="h-4 w-4 mr-1" />
+                        <ChevronRight className="h-4 w-4" />
                       </Button>
+                      
+                      <span className="px-2 py-1 text-xs text-secondary">
+                        Page {pagination.currentPage} of {pagination.totalPages}
+                      </span>
                     </div>
                   )}
                 </>
@@ -762,9 +1101,15 @@ export default function CommunityPage() {
                                 {answer.user_id === user?.id && (
                                   <button 
                                     onClick={() => confirmDeleteAnswer(answer.id)}
-                                    className="text-xs text-destructive hover:underline"
+                                    className="ml-2 p-1 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors flex items-center gap-1 text-xs"
+                                    title="Delete your answer"
                                   >
-                                    Delete
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M3 6h18"></path>
+                                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                    </svg>
+                                    <span>Delete</span>
                                   </button>
                                 )}
                             </div>
@@ -809,6 +1154,9 @@ export default function CommunityPage() {
           </div>
         </div>
       </div>
+      
+      {/* Render the delete confirmation dialog */}
+      {DeleteConfirmationDialog}
     </DashboardLayout>
   );
 }

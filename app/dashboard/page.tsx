@@ -16,13 +16,64 @@ import {
   Sparkles,
   Zap,
   Activity,
-  Award
+  Award,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState } from 'react';
+import { getProfile } from '@/actions/profile';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const profile = await getProfile(user.id.toString());
+        setHasProfile(!!profile);
+        
+        if (!profile) {
+          toast({
+            title: "Profile Required",
+            description: "Please create your profile before using AI strategy, outreach, and other features.",
+            variant: "destructive",
+            action: (
+              <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
+                Create Profile
+              </Link>
+            ),
+          });
+        }
+      } catch (error) {
+        console.error('Error checking profile:', error);
+      }
+    };
+    
+    checkUserProfile();
+  }, [user, toast]);
+
+  // Function to handle action click when no profile exists
+  const handleActionClick = (e: React.MouseEvent, hasProfile: boolean | null) => {
+    if (hasProfile === false) {
+      e.preventDefault();
+      toast({
+        title: "Profile Required",
+        description: "You must create your profile before accessing this feature.",
+        variant: "destructive",
+        action: (
+          <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
+            Create Profile
+          </Link>
+        ),
+      });
+    }
+  };
 
   const quickActions = [
     {
@@ -192,7 +243,12 @@ export default function DashboardPage() {
             {quickActions.map((action, index) => {
               const Icon = action.icon;
               return (
-                <Link key={index} href={action.href} className="floating-card p-6 group">
+                <Link
+                  key={index}
+                  href={hasProfile === false ? '#' : action.href}
+                  className="glass-card p-6 group hover:shadow-lg transition-all duration-300"
+                  onClick={(e) => handleActionClick(e, hasProfile)}
+                >
                   <div className="space-y-4">
                     <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${action.color} p-4 group-hover:scale-110 transition-transform duration-300`}>
                       <Icon className="h-6 w-6 text-white" />
@@ -206,8 +262,17 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="flex items-center text-primary text-small font-medium group-hover:gap-3 transition-all duration-300">
-                      Get started
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                      {hasProfile === false && action.href !== "/dashboard/profile" ? (
+                        <>
+                          Create profile first
+                          <AlertCircle className="h-4 w-4 ml-2 text-destructive" />
+                        </>
+                      ) : (
+                        <>
+                          Get started
+                          <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                        </>
+                      )}
                     </div>
                   </div>
                 </Link>

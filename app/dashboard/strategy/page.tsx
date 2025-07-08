@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import ReactMarkdown from 'react-markdown';
+import { cn } from '@/lib/utils';
 import { 
   Target, 
   Sparkles, 
@@ -17,15 +19,30 @@ import {
   Users,
   Heart,
   Zap,
-  Brain
+  Brain,
+  Play,
+  Pause,
+  Volume2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { generateStrategy } from '@/actions/strategy';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface StrategyResponse {
+  id: number;
+  title: string;
+  content: string;
+  audio_url: string;
+}
 
 export default function StrategyPage() {
   const [query, setQuery] = useState('');
-  const [strategy, setStrategy] = useState('');
+  const [strategy, setStrategy] = useState<StrategyResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const exampleQueries = [
     {
@@ -67,125 +84,102 @@ export default function StrategyPage() {
       });
       return;
     }
+    
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to generate a strategy.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
-      // Simulate API call with more realistic delay
-      setTimeout(() => {
-        setStrategy(`# 🎯 AI-Generated Strategic Plan: ${query}
-
-## 📊 Executive Summary
-Based on your query about "${query}", our AI has analyzed thousands of successful non-profit strategies to create this comprehensive, actionable plan tailored to your organization's unique needs.
-
-## 🔍 1. Situational Analysis
-### Current Landscape Assessment
-- **Market Position**: Evaluate your organization's standing within the sector
-- **Stakeholder Ecosystem**: Map key relationships and influence networks
-- **Resource Audit**: Comprehensive review of financial, human, and technological assets
-- **Competitive Intelligence**: Analysis of similar organizations and their methodologies
-
-### SWOT Framework
-- **Strengths**: Core competencies and unique value propositions
-- **Weaknesses**: Areas requiring immediate attention and improvement
-- **Opportunities**: Emerging trends and untapped potential
-- **Threats**: External challenges and risk factors
-
-## 🎯 2. Strategic Objectives Framework
-### Primary Mission-Critical Goals
-- **Quantifiable Outcomes**: Specific, measurable targets aligned with your mission
-- **Impact Metrics**: Key Performance Indicators (KPIs) for success measurement
-- **Timeline Milestones**: Realistic deadlines with built-in flexibility
-- **Resource Allocation**: Strategic distribution of budget, personnel, and technology
-
-### Secondary Supporting Objectives
-- **Capacity Building**: Organizational development and skill enhancement
-- **Partnership Development**: Strategic alliances and collaboration opportunities
-- **Brand Positioning**: Reputation management and thought leadership
-- **Innovation Integration**: Technology adoption and process optimization
-
-## 🚀 3. Implementation Roadmap
-### Phase 1: Foundation (Months 1-3)
-- **Infrastructure Setup**: Systems, processes, and team alignment
-- **Stakeholder Engagement**: Buy-in from board, staff, and key supporters
-- **Baseline Establishment**: Current performance metrics and benchmarks
-- **Quick Wins**: Early victories to build momentum and confidence
-
-### Phase 2: Acceleration (Months 4-8)
-- **Core Strategy Execution**: Primary initiative implementation
-- **Partnership Activation**: Collaborative relationships and joint ventures
-- **Performance Monitoring**: Regular assessment and course correction
-- **Scaling Preparation**: Systems and processes for growth
-
-### Phase 3: Optimization (Months 9-12)
-- **Impact Amplification**: Scaling successful initiatives
-- **Continuous Improvement**: Data-driven refinements and enhancements
-- **Sustainability Planning**: Long-term viability and growth strategies
-- **Knowledge Transfer**: Documentation and best practice sharing
-
-## ⚠️ 4. Risk Management & Mitigation
-### Identified Risk Categories
-- **Financial Risks**: Funding shortfalls, economic downturns, donor fatigue
-- **Operational Risks**: Staff turnover, technology failures, process breakdowns
-- **External Risks**: Regulatory changes, competitive pressures, market shifts
-- **Reputational Risks**: Public relations challenges, stakeholder conflicts
-
-### Mitigation Strategies
-- **Diversification**: Multiple revenue streams and partnership networks
-- **Contingency Planning**: Alternative approaches for critical scenarios
-- **Early Warning Systems**: Monitoring indicators and response protocols
-- **Crisis Communication**: Prepared messaging and stakeholder management
-
-## 📈 5. Performance Measurement & Optimization
-### Monitoring Framework
-- **Real-time Dashboards**: Live performance tracking and visualization
-- **Regular Reviews**: Monthly operational and quarterly strategic assessments
-- **Stakeholder Feedback**: Systematic input collection and analysis
-- **External Benchmarking**: Industry comparison and best practice adoption
-
-### Continuous Improvement Process
-- **Data-Driven Decisions**: Analytics-based strategy refinement
-- **Agile Methodology**: Rapid testing, learning, and adaptation
-- **Innovation Culture**: Encouraging experimentation and creative solutions
-- **Knowledge Management**: Capturing and sharing organizational learning
-
-## 🎯 Next Steps for Implementation
-1. **Strategy Validation**: Review with key stakeholders and subject matter experts
-2. **Resource Planning**: Detailed budget and personnel allocation
-3. **Timeline Refinement**: Adjust milestones based on organizational capacity
-4. **Communication Strategy**: Internal and external messaging about the new direction
-5. **Pilot Program**: Small-scale testing of key initiatives before full implementation
-
-## 💡 AI-Powered Recommendations
-- **Technology Integration**: Leverage automation for efficiency gains
-- **Data Analytics**: Implement robust measurement and reporting systems
-- **Partnership Opportunities**: Strategic alliances for resource sharing
-- **Innovation Adoption**: Stay ahead of sector trends and best practices
-
----
-
-*This strategy framework has been generated using advanced AI analysis of successful non-profit strategies and can be customized further based on your specific organizational context and constraints.*`);
-        setLoading(false);
+      const result = await generateStrategy({
+        profile_id: user.id,
+        query: query.trim()
+      });
+      
+      if (result && result.id !== undefined) {
+        setStrategy(result as StrategyResponse);
+        // Reset audio player state when new strategy is generated
+        setIsPlaying(false);
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+        
         toast({
           title: "Strategy generated successfully!",
           description: "Your AI-powered strategy is ready for implementation.",
         });
-      }, 3000);
+      } else {
+        throw new Error('Invalid strategy response');
+      }
     } catch (error) {
       toast({
         title: "Failed to generate strategy",
         description: "Please try again or contact support.",
         variant: "destructive",
       });
+      console.error('Strategy generation error:', error);
+    } finally {
       setLoading(false);
     }
   };
 
+  console.log(strategy)
+
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(strategy);
-    toast({
-      title: "Copied to clipboard",
-      description: "Strategy content has been copied successfully.",
-    });
+    if (strategy) {
+      navigator.clipboard.writeText(strategy.content);
+      toast({
+        title: "Copied to clipboard",
+        description: "Strategy content has been copied successfully.",
+      });
+    }
+  };
+  
+  const toggleAudio = () => {
+    if (!strategy?.audio_url) return;
+    
+    if (!audioRef.current) {
+      // Extract the audio filename from the URL
+      const audioFilename = strategy.audio_url.split('/').pop();
+      
+      if (audioFilename) {
+        // Use our API route to proxy the audio request
+        const audioProxyUrl = `/api/audio/${audioFilename}`;
+        console.log('Using audio proxy URL:', audioProxyUrl);
+        
+        audioRef.current = new Audio(audioProxyUrl);
+        audioRef.current.addEventListener('ended', () => setIsPlaying(false));
+      } else {
+        console.error('Invalid audio URL format:', strategy.audio_url);
+        toast({
+          title: "Audio playback error",
+          description: "Invalid audio format. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error('Audio playback error:', error);
+        toast({
+          title: "Audio playback error",
+          description: "There was an issue playing the audio. Please try again.",
+          variant: "destructive",
+        });
+      });
+      setIsPlaying(true);
+    }
   };
 
   const useExampleQuery = (exampleQuery: string) => {
@@ -345,11 +339,79 @@ Based on your query about "${query}", our AI has analyzed thousands of successfu
             </div>
             
             {strategy ? (
-              <div className="glass-card p-6 max-h-[600px] overflow-y-auto">
-                <div className="prose prose-sm max-w-none">
-                  <pre className="whitespace-pre-wrap text-small leading-relaxed font-normal text-primary">
-                    {strategy}
-                  </pre>
+              <div className="space-y-6">
+                {/* Strategy Title and Audio Controls */}
+                <div className="flex items-center justify-between sticky top-0 bg-background z-10 pb-4">
+                  <h3 className="text-xl font-semibold text-primary">{strategy.title}</h3>
+                  
+                  {/* Audio Player */}
+                  {strategy.audio_url && (
+                    <Button 
+                      onClick={toggleAudio} 
+                      variant="outline" 
+                      className="flex items-center gap-2 hover:bg-primary/10"
+                    >
+                      {isPlaying ? (
+                        <>
+                          <Pause className="h-4 w-4" />
+                          <span>Pause Audio</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="h-4 w-4" />
+                          <span>Play Audio</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Strategy Content */}
+                <div className="glass-card p-6" style={{ maxHeight: 'calc(100vh - 0px)', overflowY: 'auto' }}>
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({ className, ...props }) => (
+                          <h1 className={cn("text-xl font-bold mt-6 mb-4 text-primary", className)} {...props} />
+                        ),
+                        h2: ({ className, ...props }) => (
+                          <h2 className={cn("text-lg font-semibold mt-5 mb-3 text-primary", className)} {...props} />
+                        ),
+                        h3: ({ className, ...props }) => (
+                          <h3 className={cn("text-md font-semibold mt-4 mb-2 text-primary", className)} {...props} />
+                        ),
+                        p: ({ className, ...props }) => (
+                          <p className={cn("text-small leading-relaxed my-3 text-primary", className)} {...props} />
+                        ),
+                        ul: ({ className, ...props }) => (
+                          <ul className={cn("list-disc pl-6 my-3", className)} {...props} />
+                        ),
+                        ol: ({ className, ...props }) => (
+                          <ol className={cn("list-decimal pl-6 my-3", className)} {...props} />
+                        ),
+                        li: ({ className, ...props }) => (
+                          <li className={cn("mt-1", className)} {...props} />
+                        ),
+                        blockquote: ({ className, ...props }) => (
+                          <blockquote className={cn("border-l-4 border-accent pl-4 italic my-3", className)} {...props} />
+                        ),
+                        a: ({ className, ...props }) => (
+                          <a className={cn("text-accent hover:underline", className)} {...props} />
+                        ),
+                        strong: ({ className, ...props }) => (
+                          <strong className={cn("font-bold", className)} {...props} />
+                        ),
+                        code: ({ className, ...props }) => (
+                          <code className={cn("bg-surface px-1 py-0.5 rounded text-xs", className)} {...props} />
+                        ),
+                        pre: ({ className, ...props }) => (
+                          <pre className={cn("bg-surface p-3 rounded-md overflow-auto my-3", className)} {...props} />
+                        ),
+                      }}
+                    >
+                      {strategy.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             ) : (

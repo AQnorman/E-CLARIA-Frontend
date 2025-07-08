@@ -40,7 +40,7 @@ interface ProfileFormData {
   demographics: string;
   past_methods: string;
   fundraising_goals: string;
-  service_tags: string;
+  service_tags: string[];
   sustainability_practices: string;
   operating_years: number;
 }
@@ -61,7 +61,7 @@ export default function ProfilePage() {
     demographics: '',
     past_methods: '',
     fundraising_goals: '',
-    service_tags: '',
+    service_tags: [],
     sustainability_practices: '',
     operating_years: 0
   });
@@ -91,7 +91,7 @@ export default function ProfilePage() {
             demographics: profile.demographics || '',
             past_methods: profile.past_methods || '',
             fundraising_goals: profile.fundraising_goals || '',
-            service_tags: profile.service_tags || '',
+            service_tags: Array.isArray(profile.service_tags) ? profile.service_tags : (profile.service_tags ? profile.service_tags.split(',').map((tag: string) => tag.trim()) : []),
             sustainability_practices: profile.sustainability_practices || '',
             operating_years: profile.operating_years || 0
           };
@@ -115,16 +115,35 @@ export default function ProfilePage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    let newValue;
+    
+    if (name === 'operating_years') {
+      newValue = parseInt(value) || 0;
+    } else if (name === 'service_tags') {
+      // Convert comma-separated string to array
+      newValue = value ? value.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag !== '') : [];
+    } else {
+      newValue = value;
+    }
+    
     const newFormData = {
       ...formData,
-      [name]: name === 'operating_years' ? parseInt(value) || 0 : value
+      [name]: newValue
     };
+    
     setFormData(newFormData);
     
     // Check if form data has changed from original
     if (originalFormData) {
       const hasChanged = Object.keys(originalFormData).some(key => {
-        return originalFormData[key as keyof ProfileFormData] !== newFormData[key as keyof ProfileFormData];
+        const origValue = originalFormData[key as keyof ProfileFormData];
+        const newValue = newFormData[key as keyof ProfileFormData];
+        
+        if (Array.isArray(origValue) && Array.isArray(newValue)) {
+          // Compare arrays
+          return JSON.stringify(origValue) !== JSON.stringify(newValue);
+        }
+        return origValue !== newValue;
       });
       setHasChanges(hasChanged);
     }
@@ -170,6 +189,7 @@ export default function ProfilePage() {
       };
       
       const result = await createOrUpdateProfile(profileData);
+      console.log(result)
       
       toast({
         title: "Profile saved",
@@ -310,7 +330,7 @@ export default function ProfilePage() {
                 <Input
                   id="service_tags"
                   name="service_tags"
-                  value={formData.service_tags}
+                  value={Array.isArray(formData.service_tags) ? formData.service_tags.join(', ') : ''}
                   onChange={handleInputChange}
                   placeholder="e.g., education, community, youth (comma-separated)"
                   className="input"

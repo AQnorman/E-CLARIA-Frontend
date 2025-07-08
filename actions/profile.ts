@@ -6,6 +6,7 @@ import { fetchWithAuth } from '@/lib/api-utils';
  * Create or update a non-profit profile
  */
 export async function createOrUpdateProfile(profileData: any) {
+  console.log(profileData)
   return fetchWithAuth('/api/profile/', {
     method: 'POST',
     headers: {

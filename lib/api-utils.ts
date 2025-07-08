@@ -34,8 +34,17 @@ export async function fetchWithAuth(
       cookies().delete('token');
     }
     
-    const errorData = await response.json().catch(() => ({ detail: 'API request failed' }));
-    throw new Error(errorData.detail || 'API request failed');
+    try {
+      const errorData = await response.json();
+      // Check if errorData is an object with a detail property
+      const errorMessage = typeof errorData === 'object' && errorData !== null && 'detail' in errorData
+        ? errorData.detail
+        : JSON.stringify(errorData);
+      throw new Error(errorMessage || 'API request failed');
+    } catch (e) {
+      // If we can't parse the error as JSON, return a generic error
+      throw new Error(`API request failed with status ${response.status}`);
+    }
   }
 
   return response.json();
@@ -54,8 +63,17 @@ export async function fetchWithoutAuth(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ detail: 'API request failed' }));
-    throw new Error(errorData.detail || 'API request failed');
+    try {
+      const errorData = await response.json();
+      // Check if errorData is an object with a detail property
+      const errorMessage = typeof errorData === 'object' && errorData !== null && 'detail' in errorData
+        ? errorData.detail
+        : JSON.stringify(errorData);
+      throw new Error(errorMessage || 'API request failed');
+    } catch (e) {
+      // If we can't parse the error as JSON, return a generic error
+      throw new Error(`API request failed with status ${response.status}`);
+    }
   }
 
   return response.json();

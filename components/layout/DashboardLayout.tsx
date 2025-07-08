@@ -3,7 +3,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
-  Brain, 
   Target, 
   Heart, 
   MessageCircle, 
@@ -18,7 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -29,44 +28,68 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Close sidebar when route changes (for mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (sidebarOpen && window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [sidebarOpen]);
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home, color: 'from-blue-500 to-purple-600' },
+    { name: 'Profile', href: '/dashboard/profile', icon: Settings, color: 'from-gray-500 to-gray-600' },
     { name: 'AI Strategy', href: '/dashboard/strategy', icon: Target, color: 'from-blue-500 to-purple-600' },
     { name: 'Smart Outreach', href: '/dashboard/outreach', icon: Heart, color: 'from-pink-500 to-red-500' },
     { name: 'Community', href: '/dashboard/community', icon: MessageCircle, color: 'from-green-500 to-teal-500' },
     { name: 'Mentorship', href: '/dashboard/mentorship', icon: Users, color: 'from-yellow-500 to-orange-500' },
     { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp, color: 'from-indigo-500 to-blue-500' },
-    { name: 'Profile', href: '/dashboard/profile', icon: Settings, color: 'from-gray-500 to-gray-600' },
+    
   ];
 
   return (
-    <div className="min-h-screen flex relative">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Mobile backdrop overlay */}
+      <div 
+        className={`fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 lg:hidden ${
+          sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setSidebarOpen(false)}
+      />
+      
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-72 glass-card transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}>
-        <div className="flex items-center justify-between p-6">
-          <div className="flex items-center gap-3">
-            <span className="text-xl font-bold text-gradient">E-CLARIA-AI</span>
+      <div 
+        className={`fixed inset-y-0 left-0 z-40 w-full md:w-72 bg-background/80 backdrop-blur-md shadow-lg transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } flex flex-col h-full overflow-hidden`}
+      >
+        {/* Sidebar header */}
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
           </div>
           <Button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden btn btn-ghost p-2"
+            size="sm"
+            variant="ghost"
+            className="lg:hidden"
           >
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <div className="p-4">
-          <nav className="space-y-2">
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-3">
+          <div className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
@@ -75,73 +98,77 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-small transition-all duration-300 group ${
-                    isActive 
-                      ? "bg-gradient-to-r from-primary/20 to-accent/20 text-primary border border-primary/30" 
-                      : "text-secondary hover:text-primary hover:bg-surface/50"
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isActive 
+                    ? 'bg-primary/10 text-primary' 
+                    : 'text-foreground/70 hover:bg-accent/10 hover:text-foreground'}`}
+                  onClick={(e) => {
+                    // Prevent the document click handler from closing the sidebar immediately
+                    e.stopPropagation();
+                  }}
                 >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                    isActive 
-                      ? `bg-gradient-to-br ${item.color}` 
-                      : "bg-surface group-hover:bg-surface-elevated"
-                  }`}>
-                    <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-secondary group-hover:text-primary'}`} />
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-md ${isActive 
+                    ? `bg-gradient-to-br ${item.color} text-white` 
+                    : 'bg-muted/50'}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
-                  <span className="font-medium">{item.name}</span>
-                  {isActive && (
-                    <div className="ml-auto w-2 h-2 bg-primary rounded-full animate-pulse" />
-                  )}
+                  <span>{item.name}</span>
+                  {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
                 </Link>
               );
             })}
-          </nav>
-        </div>
+          </div>
+        </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          <div className="glass-card p-4 mb-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center">
-                <span className="text-white text-small font-semibold">
-                  {user?.name.charAt(0).toUpperCase()}
+        {/* User profile */}
+        <div className="mt-auto p-4">
+          <div className="flex items-center gap-3 mb-3">
+            {user?.name && (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <span className="text-white font-medium">
+                  {user.name.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-small font-medium truncate">{user?.name}</p>
-                <p className="text-small text-secondary truncate">{user?.email}</p>
-              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate">{user?.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
-            <Button
-              onClick={logout}
-              className="btn btn-ghost w-full justify-start text-secondary hover:text-primary"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
           </div>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              logout();
+            }}
+            variant="outline"
+            size="sm"
+            className="w-full justify-start mt-1"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1 flex flex-col min-h-screen">
         {/* Mobile header */}
-        <div className="lg:hidden glass-card p-4 border-b border-border/50">
-          <div className="flex items-center justify-between">
-            <Button
-              onClick={() => setSidebarOpen(true)}
-              className="btn btn-ghost p-2"
-            >
-              <Menu className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
-            </div>
-          </div>
-        </div>
+        <header className="lg:hidden sticky top-0 z-20 bg-background/80 backdrop-blur-md px-4 py-3 flex items-center justify-between">
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSidebarOpen(true);
+            }}
+            variant="ghost"
+            size="sm"
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+          <span className="text-lg font-bold text-gradient">E-CLARIA-AI</span>
+          <div className="w-8" /> {/* Empty space for balance */}
+        </header>
 
         {/* Page content */}
-        <main className="p-6 lg:p-8 min-h-screen">
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>
