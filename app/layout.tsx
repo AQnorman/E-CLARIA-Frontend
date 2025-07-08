@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import { getCurrentUser } from '@/actions/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,8 +17,13 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // We'll let the AuthContext handle initial user loading on the client side
-  const initialUser = null;
+  let initialUser = null;
+  try {
+    initialUser = await getCurrentUser();
+  } catch (error) {
+    // User is not authenticated, which is fine
+    console.log('No authenticated user found');
+  }
 
   return (
     <html lang="en" className="dark">
