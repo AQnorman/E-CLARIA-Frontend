@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { generateOutreachContent } from '@/actions/outreach';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -87,11 +88,25 @@ export default function OutreachPage() {
       });
       return;
     }
+    
+    if (!user.profile_id) {
+      toast({
+        title: "Profile Required",
+        description: "You must create your profile before accessing this feature.",
+        variant: "destructive",
+        action: (
+          <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
+            Create Profile
+          </Link>
+        ),
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       const outreachData = {
-        profile_id: user.id,
+        profile_id: user.profile_id,
         goal
       };
       // Call the server action to generate content

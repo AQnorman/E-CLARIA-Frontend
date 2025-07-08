@@ -8,6 +8,8 @@ interface User {
   id: number;
   email: string;
   name: string;
+  profile_id: number | null;
+  is_mentor: boolean | null;
 }
 
 interface AuthContextType {

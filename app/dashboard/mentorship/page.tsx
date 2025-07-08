@@ -145,6 +145,12 @@ export default function MentorshipPage() {
         bio: '',
       });
       
+      // Update user's mentor status in the AuthContext
+      if (user && typeof user === 'object') {
+        // This will trigger a UI update to show the mentor dashboard instead of "Become a Mentor"
+        user.is_mentor = true;
+      }
+      
       // Refresh mentors list
       await loadMentors();
       
@@ -347,13 +353,35 @@ export default function MentorshipPage() {
               </div>
               
               <div className="space-y-4">
-                <Button
-                  onClick={() => setShowOptInDialog(true)}
-                  className="btn btn-primary w-full"
-                >
-                  <Award className="h-4 w-4 mr-2" />
-                  Become a Mentor
-                </Button>
+                {user?.is_mentor ? (
+                  <div className="glass-card p-4 border-success/30 bg-success/5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle className="h-5 w-5 text-success" />
+                      <h3 className="text-subheading">Active Mentor</h3>
+                    </div>
+                    <p className="text-small text-secondary mb-3">
+                      You are currently an active mentor in the community. Thank you for sharing your expertise!
+                    </p>
+                    <Button
+                      onClick={() => toast({
+                        title: "Mentor Dashboard",
+                        description: "Your mentor statistics and pending requests will be available soon."
+                      })}
+                      className="btn btn-secondary w-full"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      View Mentor Dashboard
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => setShowOptInDialog(true)}
+                    className="btn btn-primary w-full"
+                  >
+                    <Award className="h-4 w-4 mr-2" />
+                    Become a Mentor
+                  </Button>
+                )}
                 
                 <div className="text-center">
                   <div className="text-small text-secondary mb-2">or</div>

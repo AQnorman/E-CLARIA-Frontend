@@ -34,24 +34,20 @@ export default function DashboardPage() {
     const checkUserProfile = async () => {
       if (!user) return;
       
-      try {
-        const profile = await getProfile(user.id.toString());
-        setHasProfile(!!profile);
-        
-        if (!profile) {
-          toast({
-            title: "Profile Required",
-            description: "Please create your profile before using AI strategy, outreach, and other features.",
-            variant: "destructive",
-            action: (
-              <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
-                Create Profile
-              </Link>
-            ),
-          });
-        }
-      } catch (error) {
-        console.error('Error checking profile:', error);
+      // Use profile_id directly from user object
+      setHasProfile(!!user.profile_id);
+      
+      if (!user.profile_id) {
+        toast({
+          title: "Profile Required",
+          description: "Please create your profile before using AI strategy, outreach, and other features.",
+          variant: "destructive",
+          action: (
+            <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
+              Create Profile
+            </Link>
+          ),
+        });
       }
     };
     

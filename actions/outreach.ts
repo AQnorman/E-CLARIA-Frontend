@@ -4,7 +4,7 @@ import { fetchWithAuth } from '@/lib/api-utils';
 
 // Define types for request and response
 export interface OutreachRequest {
-  profile_id: number;
+  profile_id: number | null;
   goal: string;
 }
 

@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
@@ -93,11 +94,25 @@ export default function StrategyPage() {
       });
       return;
     }
+    
+    if (!user.profile_id) {
+      toast({
+        title: "Profile Required",
+        description: "You must create your profile before accessing this feature.",
+        variant: "destructive",
+        action: (
+          <Link href="/dashboard/profile" className="bg-primary text-white px-3 py-1 rounded-md text-xs font-medium">
+            Create Profile
+          </Link>
+        ),
+      });
+      return;
+    }
 
     setLoading(true);
     try {
       const result = await generateStrategy({
-        profile_id: user.id,
+        profile_id: user.profile_id,
         query: query.trim()
       });
       
