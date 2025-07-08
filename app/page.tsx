@@ -118,7 +118,7 @@ export default function HomePage() {
       />
 
       {/* Hero Section */}
-      <section id="home" className="min-h-screen flex items-center justify-center pt-8 relative overflow-hidden">
+      <section id="home" className="min-h-screen flex items-center justify-center pt-16 relative overflow-hidden">
         <div className="container text-center relative z-10">
           <div className="animate-slide-up">
             {/* Brand Title */}
