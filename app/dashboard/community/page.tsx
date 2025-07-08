@@ -42,7 +42,16 @@ import {
   ChevronRight,
   Tag,
   Clock,
-  User
+  User,
+  TrendingUp,
+  Users,
+  Brain,
+  Zap,
+  Star,
+  CheckCircle2,
+  ArrowRight,
+  MessageSquare,
+  Heart
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -658,14 +667,20 @@ export default function CommunityPage() {
               </div>
             </div>
             
-            {/* User points display temporarily commented out
-            {user && (
-              <div className="flex items-center gap-2 mt-2">
-                <Award className="h-4 w-4 text-amber-500" />
-                <span className="text-small font-medium">Your Points: {userPoints}</span>
+            <div className="flex items-center gap-6 text-small">
+              <div className="flex items-center gap-2">
+                <Brain className="h-4 w-4 text-primary" />
+                <span className="text-secondary">AI-Powered</span>
               </div>
-            )}
-            */}
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-accent" />
+                <span className="text-secondary">Community-Driven</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-success" />
+                <span className="text-secondary">Real-Time Help</span>
+              </div>
+            </div>
           </div>
           
           {/* Background decoration */}
@@ -676,12 +691,46 @@ export default function CommunityPage() {
         <div className={`grid ${isMobileView ? '' : 'lg:grid-cols-3'} gap-8`}>
           {/* Questions List */}
           <div className="lg:col-span-1 space-y-6">
+            {/* Quick Stats */}
+            <div className="floating-card p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <h3 className="text-subheading">Community Stats</h3>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 glass-card">
+                  <div className="text-xl font-bold text-primary">{questions.length}</div>
+                  <div className="text-xs text-secondary">Questions</div>
+                </div>
+                <div className="text-center p-3 glass-card">
+                  <div className="text-xl font-bold text-success">
+                    {answers.reduce((sum, answer) => sum + answer.upvotes, 0)}
+                  </div>
+                  <div className="text-xs text-secondary">Total Votes</div>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-accent/10 rounded-lg border border-accent/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star className="h-4 w-4 text-accent" />
+                  <span className="text-small font-medium text-accent">Featured</span>
+                </div>
+                <p className="text-xs text-secondary">
+                  Get AI-powered suggestions for your answers and earn community points!
+                </p>
+              </div>
+            </div>
+
             <div className="floating-card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-subheading">Questions</h2>
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="h-5 w-5 text-primary" />
+                  <h2 className="text-subheading">Questions</h2>
+                </div>
                 <Button
                   onClick={() => setShowNewQuestionForm(!showNewQuestionForm)}
-                  className="btn btn-secondary"
+                  className="btn btn-primary"
                   size="sm"
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
@@ -783,7 +832,7 @@ export default function CommunityPage() {
               
               {/* New Question Form */}
               {showNewQuestionForm && (
-                <div className="glass-card p-4 mb-6">
+                <div className="glass-card p-6 mb-6 border border-primary/20 bg-primary/5">
                   <h3 className="text-small font-medium mb-4">Ask a New Question</h3>
                   <form onSubmit={handlePostQuestion} className="space-y-4">
                     <div>
@@ -871,17 +920,29 @@ export default function CommunityPage() {
                       <div
                         key={question.id}
                         onClick={() => handleSelectQuestion(question)}
-                        className={`glass-card p-4 cursor-pointer transition-all duration-300 hover:bg-surface/50 ${
+                        className={`glass-card p-4 cursor-pointer transition-all duration-300 hover:bg-surface/50 hover:border-primary/30 group ${
                           selectedQuestion?.id === question.id ? 'border-primary bg-primary/5' : ''
                         }`}
                       >
-                        <h3 className="text-small font-medium mb-2">{question.title}</h3>
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-small font-medium group-hover:text-gradient transition-all duration-300 flex-1">
+                            {question.title}
+                          </h3>
+                          <ArrowRight className="h-4 w-4 text-secondary group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 ml-2" />
+                        </div>
                         <p className="text-xs text-secondary line-clamp-2 mb-3">{question.content}</p>
                         
                         <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2">
                             <Tag className="h-3 w-3 text-secondary" />
-                            <span className="text-secondary">{question.tags || 'No tags'}</span>
+                            <span className="text-secondary">
+                              {question.tags ? question.tags.split(',').slice(0, 2).join(', ') : 'No tags'}
+                              {question.tags && question.tags.split(',').length > 2 && '...'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <User className="h-3 w-3 text-secondary" />
+                            <span className="text-secondary">User #{question.user_id}</span>
                           </div>
                         </div>
                       </div>
@@ -958,8 +1019,19 @@ export default function CommunityPage() {
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-secondary">No questions found</p>
-                  <p className="text-xs text-secondary mt-1">Be the first to ask a question!</p>
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-green-500" />
+                  </div>
+                  <h3 className="text-subheading mb-2">No questions yet</h3>
+                  <p className="text-body text-secondary mb-4">Be the first to start a conversation!</p>
+                  <Button
+                    onClick={() => setShowNewQuestionForm(true)}
+                    className="btn btn-primary"
+                    size="sm"
+                  >
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Ask First Question
+                  </Button>
                 </div>
               )}
             </div>
@@ -971,19 +1043,32 @@ export default function CommunityPage() {
               <>
                 {/* Selected Question */}
                 <div className="floating-card p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <CheckCircle2 className="h-5 w-5 text-success" />
+                    <span className="text-small font-medium text-success">Selected Question</span>
+                  </div>
                   <h2 className="text-subheading mb-4">{selectedQuestion.title}</h2>
                   <p className="text-body mb-6">{selectedQuestion.content}</p>
                   
-                  <div className="flex items-center justify-between text-small">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between text-small bg-surface/30 p-4 rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
                       <Tag className="h-4 w-4 text-secondary" />
-                      <span className="text-secondary">{selectedQuestion.tags || 'No tags'}</span>
+                        <span className="text-secondary">{selectedQuestion.tags || 'No tags'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-secondary" />
+                        <span className="text-secondary">User #{selectedQuestion.user_id}</span>
+                      </div>
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-secondary" />
+                      <Clock className="h-4 w-4 text-secondary" />
                       <span className="text-secondary">
-                        User #{selectedQuestion.user_id}
+                        {selectedQuestion.created_at 
+                          ? new Date(selectedQuestion.created_at).toLocaleDateString()
+                          : 'Recently'
+                        }
                       </span>
                     </div>
                   </div>
@@ -992,9 +1077,12 @@ export default function CommunityPage() {
                 {/* Answers */}
                 <div className="floating-card p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-subheading">
-                      Answers <span className="text-small text-secondary">({answers.length})</span>
-                    </h3>
+                    <div className="flex items-center gap-3">
+                      <Heart className="h-5 w-5 text-accent" />
+                      <h3 className="text-subheading">
+                        Answers <span className="text-small text-secondary">({answers.length})</span>
+                      </h3>
+                    </div>
                     <div className="flex gap-2">
                       <Button
                         onClick={handleGetSuggestion}
@@ -1042,7 +1130,7 @@ export default function CommunityPage() {
                   
                   {/* Answer Form */}
                   {showAnswerForm && (
-                    <div className="glass-card p-4 mb-6">
+                    <div className="glass-card p-6 mb-6 border border-primary/20 bg-primary/5">
                       <h4 className="text-small font-medium mb-4">Your Answer</h4>
                       <form onSubmit={handlePostAnswer} className="space-y-4">
                         <Textarea
@@ -1089,15 +1177,26 @@ export default function CommunityPage() {
                   {answers.length > 0 ? (
                     <div className="space-y-6">
                       {answers.map((answer) => (
-                        <div key={answer.id} className="glass-card p-4">
+                        <div key={answer.id} className="glass-card p-6 hover:bg-surface/30 transition-all duration-300 group">
                           <p className="text-body mb-4">{answer.content}</p>
                           
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
                               <User className="h-4 w-4 text-secondary" />
                               <span className="text-small text-secondary">
                                 User #{answer.user_id}
                               </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-secondary" />
+                                <span className="text-small text-secondary">
+                                  {answer.created_at 
+                                    ? new Date(answer.created_at).toLocaleDateString()
+                                    : 'Recently'
+                                  }
+                                </span>
+                              </div>
                                 {answer.user_id === user?.id && (
                                   <button 
                                     onClick={() => confirmDeleteAnswer(answer.id)}
@@ -1113,29 +1212,42 @@ export default function CommunityPage() {
                                   </button>
                                 )}
                             </div>
-                            <Button
-                              onClick={() => handleUpvote(answer.id)}
-                              disabled={upvoting === answer.id}
-                              className="btn btn-ghost"
-                              size="sm"
-                            >
-                              {upvoting === answer.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <>
-                                  <ThumbsUp className="h-4 w-4 mr-2" />
-                                  <span>{answer.upvotes}</span>
-                                </>
-                              )}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                onClick={() => handleUpvote(answer.id)}
+                                disabled={upvoting === answer.id}
+                                className="btn btn-ghost group-hover:bg-success/10 group-hover:text-success transition-all duration-300"
+                                size="sm"
+                              >
+                                {upvoting === answer.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <ThumbsUp className="h-4 w-4 mr-2" />
+                                    <span className="font-medium">{answer.upvotes}</span>
+                                  </>
+                                )}
+                              </Button>
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-secondary">No answers yet</p>
-                      <p className="text-xs text-secondary mt-1">Be the first to answer this question!</p>
+                      <div className="w-16 h-16 bg-gradient-to-br from-accent/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Heart className="h-8 w-8 text-accent" />
+                      </div>
+                      <h3 className="text-subheading mb-2">No answers yet</h3>
+                      <p className="text-body text-secondary mb-4">Be the first to help with this question!</p>
+                      <Button
+                        onClick={() => setShowAnswerForm(true)}
+                        className="btn btn-primary"
+                        size="sm"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Write First Answer
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -1143,9 +1255,11 @@ export default function CommunityPage() {
             ) : (
               <div className="floating-card p-6 h-full flex items-center justify-center">
                 <div className="text-center">
-                  <MessageCircle className="h-12 w-12 text-secondary/30 mx-auto mb-4" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <MessageCircle className="h-10 w-10 text-green-500" />
+                  </div>
                   <h3 className="text-subheading mb-2">Select a Question</h3>
-                  <p className="text-secondary">
+                  <p className="text-body text-secondary max-w-sm mx-auto">
                     Choose a question from the list to view details and answers
                   </p>
                 </div>
