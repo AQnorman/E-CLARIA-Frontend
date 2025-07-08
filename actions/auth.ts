@@ -11,7 +11,7 @@ const API_BASE_URL = process.env.API_URL || 'http://localhost:8000';
 export async function login(email: string, password: string) {
   // Ensure we're in a valid request context
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
   } catch (error) {
     throw new Error('Login function must be called within a valid request context');
   }
@@ -56,7 +56,7 @@ export async function login(email: string, password: string) {
   const data = await response.json();
   
   // Store token in an HTTP-only cookie for better security
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   cookieStore.set('token', data.access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -87,7 +87,7 @@ export async function register(name: string, email: string, password: string) {
 export async function getCurrentUser() {
   let token;
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     token = cookieStore.get('token')?.value;
   } catch (error) {
     // If cookies() fails, we're not in a valid request context
@@ -111,7 +111,7 @@ export async function getCurrentUser() {
  */
 export async function logout() {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.delete('token');
   } catch (error) {
     throw new Error('Logout function must be called within a valid request context');
