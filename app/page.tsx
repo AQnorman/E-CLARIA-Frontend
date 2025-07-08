@@ -123,7 +123,7 @@ export default function HomePage() {
           <div className="animate-slide-up">
             {/* Brand Title */}
             <div className="mb-8">
-                <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA-AI</span>
+                <span className="text-gradient font-bold text-lg tracking-wide">E-CLARIA</span>
                 <div className="w-2 h-2 bg-success rounded-full animate-pulse" />
             </div>
             
